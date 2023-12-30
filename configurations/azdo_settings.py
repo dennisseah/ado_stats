@@ -1,3 +1,5 @@
+import urllib.parse as parser
+
 from pydantic_settings import BaseSettings
 
 
@@ -19,4 +21,4 @@ class Azdo_Settings(BaseSettings):
         )
 
     def get_rest_base_uri(self) -> str:
-        return f"https://dev.azure.com/{self.azdo_project_name}/{self.azdo_org_name}/_apis/git"
+        return f"https://dev.azure.com/{self.azdo_project_name}/{parser.quote(self.azdo_org_name)}/_apis/git"
