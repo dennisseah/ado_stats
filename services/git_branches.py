@@ -4,7 +4,7 @@ from configurations.azdo_settings import Azdo_Settings
 from models.git_branch import GitBranch
 
 
-def fetch_git_branches(
+def fetch(
     settings: Azdo_Settings,
     repo: str,
 ) -> list[GitBranch]:

@@ -2,14 +2,13 @@ from statistics.base import aggr_accumulated, aggr_state, lifecycle
 
 from tabulate import tabulate
 
-import services.user_stories as us_svc
 import utils.aggr_utils as aggr_utils
 from configurations.azdo_settings import Azdo_Settings
+from services.user_stories import fetch as fetch_stories
 
 
-def generate():
-    settings = Azdo_Settings.model_validate({})
-    user_stories = us_svc.get_user_stories(settings)
+def generate(settings: Azdo_Settings):
+    user_stories = fetch_stories(settings)
 
     print("User Stories by states")
     aggr_state(data=user_stories)
@@ -28,6 +27,3 @@ def generate():
             tablefmt="fancy_grid",
         )
     )
-
-
-generate()

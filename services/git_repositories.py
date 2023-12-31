@@ -3,7 +3,7 @@ import requests
 from configurations.azdo_settings import Azdo_Settings
 
 
-def get_repos(settings: Azdo_Settings):
+def fetch(settings: Azdo_Settings):
     url = f"{settings.get_rest_base_uri()}/git/repositories"
     response = requests.get(url, auth=("", settings.azdo_pat))
 

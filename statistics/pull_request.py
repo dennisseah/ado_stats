@@ -5,8 +5,8 @@ from tabulate import tabulate
 
 from configurations.azdo_settings import Azdo_Settings
 from models.pull_request import PullRequest
-from services.git_repositories import get_repos
-from services.pull_requests import get_pull_requests
+from services.git_repositories import fetch as fetch_repositories
+from services.pull_requests import fetch as fetch_pull_requests
 
 
 class CountItem(BaseModel):
@@ -90,14 +90,14 @@ def tbl(data: list[tuple[str, int, int, int, int, int]]):
     )
 
 
-def generate():
+def generate(settings: Azdo_Settings):
     settings = Azdo_Settings.model_validate({})
-    repos = get_repos(settings)
+    repos = fetch_repositories(settings)
     total = []
     merge_times = []
 
     for repo in repos:
-        prs = get_pull_requests(settings, repo)
+        prs = fetch_pull_requests(settings, repo)
 
         print(f"found {len(prs)} pull requests for {repo}")
         tbl(aggr(prs))
@@ -117,6 +117,3 @@ def generate():
             tablefmt="fancy_grid",
         )
     )
-
-
-generate()

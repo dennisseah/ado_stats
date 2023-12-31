@@ -28,7 +28,7 @@ def fetch_pull_requests(
     raise ValueError("Cannot fetch data")
 
 
-def get_pull_requests(settings: Azdo_Settings, repo: str, active_only: bool = False):
+def fetch(settings: Azdo_Settings, repo: str, active_only: bool = False):
     prs = []
     results = fetch_pull_requests(settings=settings, repo=repo, active_only=active_only)
 
