@@ -56,7 +56,13 @@ def aggr_accumulated(data: list[Any]):
     print(
         tabulate(
             tabular_data=results,
-            headers=["week", "# created", "# closed", "# removed", "accumulated"],
+            headers=[
+                "year - week",
+                "# created",
+                "# closed",
+                "# removed",
+                "accumulated",
+            ],
             tablefmt="fancy_grid",
         )
     )

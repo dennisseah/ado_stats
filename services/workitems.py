@@ -44,7 +44,10 @@ def fetch_work_items(
     response = requests.get(url, auth=("", settings.azdo_pat))
 
     if response.status_code == 200:
-        return [creator(val) for val in response.json()["value"]]
+        return [
+            creator(val, settings.get_name_discard_str())
+            for val in response.json()["value"]
+        ]
 
     raise ValueError(response.text)
 
