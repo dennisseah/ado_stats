@@ -19,7 +19,7 @@ def fetch_pull_requests(
 
     if response.status_code == 200:
         return [
-            PullRequest.from_json(
+            PullRequest.from_data(
                 repo=repo, data=pr, discard_name_str=settings.get_name_discard_str()
             )
             for pr in response.json()["value"]

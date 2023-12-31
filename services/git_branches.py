@@ -19,7 +19,7 @@ def fetch_git_branches(
 
     if response.status_code == 200:
         return [
-            GitBranch.from_json(
+            GitBranch.from_data(
                 repo=repo, data=d, discard_name_str=settings.get_name_discard_str()
             )
             for d in response.json()["value"]

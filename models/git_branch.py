@@ -11,7 +11,7 @@ class GitBranch(BaseModel):
     creator: str
 
     @classmethod
-    def from_json(
+    def from_data(
         cls, repo: str, data: dict[str, Any], discard_name_str: list[str]
     ) -> "GitBranch":
         creator = format_name(
