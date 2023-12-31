@@ -4,6 +4,7 @@ from typing import Any
 from pydantic import BaseModel
 
 from utils.date_utils import to_date
+from utils.name_formatter import format_name
 
 
 class PullRequest(BaseModel):
@@ -17,12 +18,12 @@ class PullRequest(BaseModel):
     reviewers: list[str] = []
 
     @classmethod
-    def from_json(cls, repo: str, data: dict[str, Any]) -> "PullRequest":
-        created_by = (
-            data["createdBy"]["displayName"]
-            .replace("(Contractor)", "")
-            .replace("Microsoft", "")
-            .strip()
+    def from_json(
+        cls, repo: str, data: dict[str, Any], discard_name_str: list[str]
+    ) -> "PullRequest":
+        created_by = format_name(
+            name=data["createdBy"]["displayName"],
+            discard_str=discard_name_str,
         )
         d_create = to_date(data["creationDate"])
         d_close = to_date(data.get("closedDate"))
@@ -31,7 +32,9 @@ class PullRequest(BaseModel):
         merge_days = (d_close - d_create).days if d_close else None  # type: ignore
 
         reviewers = [
-            r["displayName"] for r in data.get("reviewers", []) if r.get("vote", 0) > 0
+            format_name(name=r["displayName"], discard_str=discard_name_str)
+            for r in data.get("reviewers", [])
+            if r.get("vote", 0) > 0
         ]
         return PullRequest(
             repo=repo,

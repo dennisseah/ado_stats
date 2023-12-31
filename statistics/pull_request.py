@@ -3,9 +3,10 @@ from collections import defaultdict
 from pydantic import BaseModel
 from tabulate import tabulate
 
-import services.pull_requests as pr_svc
 from configurations.azdo_settings import Azdo_Settings
 from models.pull_request import PullRequest
+from services.git_repositories import get_repos
+from services.pull_requests import get_pull_requests
 
 
 class CountItem(BaseModel):
@@ -45,10 +46,13 @@ def aggr(results: list[PullRequest]) -> list[tuple[str, int, int, int, int, int]
     for engr in filter(lambda x: x not in engineers, reviewers.keys()):
         counts[engr] = CountItem(reviewed=reviewers[engr])
 
-    return [
+    response = [
         (k, v.total, v.active, v.completed, v.abandoned, v.reviewed)
         for k, v in counts.items()
     ]
+    response.sort(key=lambda x: x[1], reverse=True)
+
+    return response
 
 
 def time_to_merge(
@@ -88,12 +92,12 @@ def tbl(data: list[tuple[str, int, int, int, int, int]]):
 
 def generate():
     settings = Azdo_Settings.model_validate({})
-    repos = pr_svc.get_all_repos(settings)
+    repos = get_repos(settings)
     total = []
     merge_times = []
 
     for repo in repos:
-        prs = pr_svc.get_pull_requests(settings, repo)
+        prs = get_pull_requests(settings, repo)
 
         print(f"found {len(prs)} pull requests for {repo}")
         tbl(aggr(prs))

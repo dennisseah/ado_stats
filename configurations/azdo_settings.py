@@ -9,6 +9,7 @@ class Azdo_Settings(BaseSettings):
     azdo_pat: str
     area_paths: str | None = None
     repos_ignore: str | None = None
+    name_discard_str: str | None = None
 
     class Config:
         env_file = ".env"
@@ -17,6 +18,13 @@ class Azdo_Settings(BaseSettings):
     def get_area_paths(self) -> list[str]:
         return (
             [r.strip() for r in self.area_paths.split(",")] if self.area_paths else []
+        )
+
+    def get_name_discard_str(self) -> list[str]:
+        return (
+            [r.strip() for r in self.name_discard_str.split(",")]
+            if self.name_discard_str
+            else []
         )
 
     def get_ignored_repos(self) -> list[str]:
