@@ -1,18 +1,18 @@
 from typing import Any
 
 from utils.aggr_utils import aggr_count, merge
-from utils.display import as_table
+from utils.display import Table
 
 
-def aggr_state(title: str, data: list[Any]):
-    as_table(
+def aggr_state(title: str, data: list[Any]) -> Table:
+    return Table(
         title=title,
         headers=["state", "count"],
         data=aggr_count(data=data, dimension="state"),
     )
 
 
-def aggr_accumulated(title: str, data: list[Any]):
+def aggr_accumulated(title: str, data: list[Any]) -> Table:
     aggr_created = aggr_count(data, "created_week", sort_values=False)
     aggr_closed = aggr_count(data, "closed_week", sort_values=False)
     aggr_removed = aggr_count(
@@ -50,14 +50,20 @@ def aggr_accumulated(title: str, data: list[Any]):
             )
         )
 
-    as_table(
+    return Table(
         title=title,
-        headers=["year - week", "# created", "# closed", "# removed", "accumulated"],
+        headers=[
+            "year - week",
+            "# created",
+            "# closed",
+            "# removed",
+            "accumulated",
+        ],
         data=results,
     )
 
 
-def lifecycle(title: str, data: list[Any]):
+def lifecycle(title: str, data: list[Any]) -> Table:
     created_by = aggr_count(data=data, dimension="created_by")
     assigned = aggr_count(data=data, dimension="assigned_to")
     closed_by = aggr_count(data=data, dimension="closed_by")
@@ -65,7 +71,7 @@ def lifecycle(title: str, data: list[Any]):
     merged = merge([created_by, assigned, closed_by, removed_by])
     merged.sort(key=lambda x: x[1], reverse=True)
 
-    as_table(
+    return Table(
         title=title,
         headers=["engineer", "created", "assigned", "closed", "removed"],
         data=merged,

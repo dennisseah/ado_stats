@@ -3,6 +3,9 @@ from typing import Any, Callable
 import requests
 
 from configurations.azdo_settings import Azdo_Settings
+from utils.data_cache import DataCache
+
+data_cache = DataCache()
 
 
 def divide_chunks(data: list[str], n):
@@ -53,10 +56,15 @@ def fetch_work_items(
 
 
 def get_all_items(settings: Azdo_Settings, kind: str, creator: Callable) -> list[Any]:
+    items = data_cache.get(kind)
+    if items:
+        return items
+
     item_ids = get_ids(settings=settings, kind=kind)
     items: list[Any] = []
 
     for chunk in divide_chunks(item_ids, 200):
         items += fetch_work_items(settings=settings, item_ids=chunk, creator=creator)
 
+    data_cache.push(key=kind, value=items)
     return items

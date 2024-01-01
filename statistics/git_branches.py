@@ -2,7 +2,7 @@ from configurations.azdo_settings import Azdo_Settings
 from models.git_branch import GitBranch
 from services.git_branches import fetch as fetch_branches
 from services.git_repositories import fetch as fetch_repositories
-from utils.display import as_table
+from utils.display import Table, as_table_group
 
 
 def generate(settings: Azdo_Settings):
@@ -20,4 +20,9 @@ def generate(settings: Azdo_Settings):
     ]
     data.sort(key=lambda x: x[0])
 
-    as_table(title="Git branches", headers=["repo", "name", "creator"], data=data)
+    as_table_group(
+        group_name="Git branches",
+        tables=[
+            Table(title="Git branches", headers=["repo", "name", "creator"], data=data)
+        ],
+    )

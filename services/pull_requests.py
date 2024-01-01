@@ -2,6 +2,9 @@ import requests
 
 from configurations.azdo_settings import Azdo_Settings
 from models.pull_request import PullRequest
+from utils.data_cache import DataCache
+
+data_cache = DataCache()
 
 
 def fetch_pull_requests(
@@ -29,6 +32,10 @@ def fetch_pull_requests(
 
 
 def fetch(settings: Azdo_Settings, repo: str, active_only: bool = False):
+    prs = data_cache.get(f"Pull Request {repo}")
+    if prs:
+        return prs
+
     prs = []
     results = fetch_pull_requests(settings=settings, repo=repo, active_only=active_only)
 
@@ -38,4 +45,5 @@ def fetch(settings: Azdo_Settings, repo: str, active_only: bool = False):
             settings=settings, repo=repo, active_only=active_only, skip=len(prs)
         )
 
+    data_cache.push(key=f"Pull Request {repo}", value=prs)
     return prs

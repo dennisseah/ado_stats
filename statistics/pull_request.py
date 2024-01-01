@@ -6,7 +6,7 @@ from configurations.azdo_settings import Azdo_Settings
 from models.pull_request import PullRequest
 from services.git_repositories import fetch as fetch_repositories
 from services.pull_requests import fetch as fetch_pull_requests
-from utils.display import as_table
+from utils.display import Table, as_table_group
 
 
 class CountItem(BaseModel):
@@ -73,8 +73,8 @@ def time_to_merge(
     )
 
 
-def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]):
-    as_table(
+def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]) -> Table:
+    return Table(
         title=title,
         headers=[
             "engineer",
@@ -94,16 +94,26 @@ def generate(settings: Azdo_Settings):
     total = []
     merge_times = []
 
+    tables = []
+
     for repo in repos:
         prs = fetch_pull_requests(settings, repo)
-        tbl(title=f"found {len(prs)} pull requests for {repo}", data=aggr(prs))
+        tables.append(
+            tbl(title=f"found {len(prs)} pull requests for {repo}", data=aggr(prs))
+        )
         merge_times.append(time_to_merge(repo, prs))
         total += prs
 
-    tbl(title=f"found {len(total)} pull requests in total", data=aggr(total))
-
-    as_table(
-        title="days to merge pull requests",
-        headers=["repo", "mean", "median", "max", "min"],
-        data=merge_times,
+    tables.append(
+        tbl(title=f"found {len(total)} pull requests in total", data=aggr(total))
     )
+
+    tables.append(
+        Table(
+            title="days to merge pull requests",
+            headers=["repo", "mean", "median", "max", "min"],
+            data=merge_times,
+        )
+    )
+
+    as_table_group(group_name="Pull requests", tables=tables)
