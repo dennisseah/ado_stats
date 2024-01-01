@@ -1,12 +1,12 @@
 from collections import defaultdict
 
 from pydantic import BaseModel
-from tabulate import tabulate
 
 from configurations.azdo_settings import Azdo_Settings
 from models.pull_request import PullRequest
 from services.git_repositories import fetch as fetch_repositories
 from services.pull_requests import fetch as fetch_pull_requests
+from utils.display import as_table
 
 
 class CountItem(BaseModel):
@@ -73,20 +73,18 @@ def time_to_merge(
     )
 
 
-def tbl(data: list[tuple[str, int, int, int, int, int]]):
-    print(
-        tabulate(
-            tabular_data=data,
-            headers=[
-                "engineer",
-                "created",
-                "active",
-                "completed",
-                "abandoned",
-                "reviewed",
-            ],
-            tablefmt="fancy_grid",
-        )
+def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]):
+    as_table(
+        title=title,
+        headers=[
+            "engineer",
+            "created",
+            "active",
+            "completed",
+            "abandoned",
+            "reviewed",
+        ],
+        data=data,
     )
 
 
@@ -98,22 +96,14 @@ def generate(settings: Azdo_Settings):
 
     for repo in repos:
         prs = fetch_pull_requests(settings, repo)
-
-        print(f"found {len(prs)} pull requests for {repo}")
-        tbl(aggr(prs))
+        tbl(title=f"found {len(prs)} pull requests for {repo}", data=aggr(prs))
         merge_times.append(time_to_merge(repo, prs))
         total += prs
 
-    print()
-    print(f"found {len(total)} pull requests in total")
-    tbl(aggr(total))
+    tbl(title=f"found {len(total)} pull requests in total", data=aggr(total))
 
-    print()
-    print("days to merge pull requests")
-    print(
-        tabulate(
-            tabular_data=merge_times,
-            headers=["repo", "mean", "median", "max", "min"],
-            tablefmt="fancy_grid",
-        )
+    as_table(
+        title="days to merge pull requests",
+        headers=["repo", "mean", "median", "max", "min"],
+        data=merge_times,
     )

@@ -7,11 +7,6 @@ from services.features import fetch as fetch_features
 def generate(settings: Azdo_Settings):
     features = fetch_features(settings)
 
-    print("Feature by states")
-    aggr_state(data=features)
-
-    print("Contributors to features")
-    lifecycle(data=features)
-
-    print("Accumulated features")
-    aggr_accumulated(data=features)
+    aggr_state(title="Feature by states", data=features)
+    lifecycle(title="Feature Counts", data=features)
+    aggr_accumulated(title="Accumulated features", data=features)

@@ -1,10 +1,9 @@
 from collections import defaultdict
 
-from tabulate import tabulate
-
 from configurations.azdo_settings import Azdo_Settings
 from models.user_story import UserStory
 from services.user_stories import fetch as fetch_stories
+from utils.display import as_table
 
 
 def aggr_milestones(data: list[UserStory]):
@@ -27,11 +26,6 @@ def generate(settings: Azdo_Settings):
         if x.milestone and x.state != "Removed" and x.assigned_to is not None
     ]
     points = aggr_milestones(data=user_stories)
-    print("Story points by milestone")
-    print(
-        tabulate(
-            tabular_data=points,
-            headers=["milestone", "points"],
-            tablefmt="fancy_grid",
-        )
+    as_table(
+        title="Story points by milestone", headers=["milestone", "points"], data=points
     )

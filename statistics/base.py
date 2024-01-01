@@ -1,21 +1,18 @@
 from typing import Any
 
-from tabulate import tabulate
-
 from utils.aggr_utils import aggr_count, merge
+from utils.display import as_table
 
 
-def aggr_state(data: list[Any]):
-    print(
-        tabulate(
-            tabular_data=aggr_count(data=data, dimension="state"),
-            headers=["state", "count"],
-            tablefmt="fancy_grid",
-        )
+def aggr_state(title: str, data: list[Any]):
+    as_table(
+        title=title,
+        headers=["state", "count"],
+        data=aggr_count(data=data, dimension="state"),
     )
 
 
-def aggr_accumulated(data: list[Any]):
+def aggr_accumulated(title: str, data: list[Any]):
     aggr_created = aggr_count(data, "created_week", sort_values=False)
     aggr_closed = aggr_count(data, "closed_week", sort_values=False)
     aggr_removed = aggr_count(
@@ -53,22 +50,14 @@ def aggr_accumulated(data: list[Any]):
             )
         )
 
-    print(
-        tabulate(
-            tabular_data=results,
-            headers=[
-                "year - week",
-                "# created",
-                "# closed",
-                "# removed",
-                "accumulated",
-            ],
-            tablefmt="fancy_grid",
-        )
+    as_table(
+        title=title,
+        headers=["year - week", "# created", "# closed", "# removed", "accumulated"],
+        data=results,
     )
 
 
-def lifecycle(data: list[Any]):
+def lifecycle(title: str, data: list[Any]):
     created_by = aggr_count(data=data, dimension="created_by")
     assigned = aggr_count(data=data, dimension="assigned_to")
     closed_by = aggr_count(data=data, dimension="closed_by")
@@ -76,10 +65,8 @@ def lifecycle(data: list[Any]):
     merged = merge([created_by, assigned, closed_by, removed_by])
     merged.sort(key=lambda x: x[1], reverse=True)
 
-    print(
-        tabulate(
-            tabular_data=merged,
-            headers=["engineer", "created", "assigned", "closed", "removed"],
-            tablefmt="fancy_grid",
-        )
+    as_table(
+        title=title,
+        headers=["engineer", "created", "assigned", "closed", "removed"],
+        data=merged,
     )
