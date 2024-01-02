@@ -12,6 +12,12 @@ class Table(BaseModel):
         return {h: [x[i] for x in self.data] for i, h in enumerate(self.headers)}
 
 
+def as_table(table: Table, tablefmt="fancy_grid"):
+    print()
+    print(table.title)
+    print(tabulate(table.data, headers=table.headers, tablefmt=tablefmt))
+
+
 def as_table_group(
     group_name: str, tables: list[Table], tablefmt="fancy_grid", streamlit: bool = False
 ):

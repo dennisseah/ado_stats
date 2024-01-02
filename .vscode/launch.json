@@ -10,6 +10,13 @@
       "request": "launch",
       "module": "statistics.main",
       "console": "integratedTerminal"
+    },
+    {
+      "name": "validate unresolved tasks",
+      "type": "python",
+      "request": "launch",
+      "module": "validations.unresolved_tasks",
+      "console": "integratedTerminal"
     }
   ]
 }

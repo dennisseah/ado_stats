@@ -18,6 +18,7 @@ class WorkItem(BaseModel):
     created_date: datetime
     created_week: str | None
     created_by: str
+    story_points: int = 3
     changed_date: datetime | None
     changed_week: str | None
     changed_by: str | None
@@ -25,7 +26,7 @@ class WorkItem(BaseModel):
     closed_week: str | None
     closed_by: str | None
     assigned_to: str | None
-    story_points: int
+    parent_id: str | None
 
     @classmethod
     def from_data(cls, data: dict[str, Any], discard_name_str: list[str]) -> "WorkItem":
@@ -40,6 +41,16 @@ class WorkItem(BaseModel):
         created_week = to_week(created_date)
         changed_week = to_week(changed_date)
         closed_week = to_week(closed_date)
+        parent = next(
+            (
+                x
+                for x in data.get("relations", [])
+                if x.get("attributes", {}).get("name", "") == "Parent"
+            ),
+            None,
+        )
+        parent_url = parent.get("url") if parent else None
+        parent_id = parent_url.split("/")[-1] if parent_url else None
 
         def fmt_name(field_name: str) -> str | None:
             return (
@@ -73,4 +84,5 @@ class WorkItem(BaseModel):
             closed_date=closed_date,
             closed_week=closed_week,
             closed_by=fmt_name("Microsoft.VSTS.Common.ClosedBy"),
+            parent_id=parent_id,
         )
