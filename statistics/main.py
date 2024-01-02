@@ -9,7 +9,7 @@ import streamlit as st
 
 from configurations.azdo_settings import Azdo_Settings
 
-with_st = True
+with_st = False
 
 # command for streamlit and without streamlit respectively:
 #
