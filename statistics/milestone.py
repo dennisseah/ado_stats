@@ -19,7 +19,7 @@ def aggr_milestones(data: list[UserStory]):
     return results
 
 
-def generate(settings: Azdo_Settings):
+def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     user_stories = [
         x
         for x in fetch_stories(settings)
@@ -27,7 +27,7 @@ def generate(settings: Azdo_Settings):
     ]
     points = aggr_milestones(data=user_stories)
     as_table_group(
-        group_name="Milestones",
+        group_name=title,
         tables=[
             Table(
                 title="Story points by milestone",
@@ -35,4 +35,5 @@ def generate(settings: Azdo_Settings):
                 data=points,
             )
         ],
+        streamlit=streamlit,
     )

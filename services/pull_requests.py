@@ -1,3 +1,5 @@
+import logging
+
 import requests
 
 from configurations.azdo_settings import Azdo_Settings
@@ -13,6 +15,8 @@ def fetch_pull_requests(
     active_only: bool = False,
     skip: int = 0,
 ):
+    logging.info(f"[STARTED] Fetching pull requests for {repo}")
+
     url = f"{settings.get_rest_base_uri()}/git/repositories/{repo}/pullrequests"
     params: dict[str, str | int] = {"api-version": "7.0", "$skip": skip}
     if not active_only:
@@ -21,6 +25,7 @@ def fetch_pull_requests(
     response = requests.get(url, params=params, auth=("", settings.azdo_pat))
 
     if response.status_code == 200:
+        logging.info(f"[COMPLETED] Fetching pull requests for {repo}")
         return [
             PullRequest.from_data(
                 repo=repo, data=pr, discard_name_str=settings.get_name_discard_str()
@@ -28,12 +33,16 @@ def fetch_pull_requests(
             for pr in response.json()["value"]
         ]
 
+    logging.error(f"Error fetching pull requests for {repo}: {response.text}")
     raise ValueError("Cannot fetch data")
 
 
 def fetch(settings: Azdo_Settings, repo: str, active_only: bool = False):
+    logging.info(f"[STARTED] Fetching pull requests for {repo}")
+
     prs = data_cache.get(f"Pull Request {repo}")
     if prs:
+        logging.info(f"Found pull requests for {repo} in cache")
         return prs
 
     prs = []
@@ -45,5 +54,8 @@ def fetch(settings: Azdo_Settings, repo: str, active_only: bool = False):
             settings=settings, repo=repo, active_only=active_only, skip=len(prs)
         )
 
+    logging.info(f"Cache pull requests for {repo}.")
     data_cache.push(key=f"Pull Request {repo}", value=prs)
+
+    logging.info(f"[COMPLETED] Fetching pull requests for {repo}")
     return prs

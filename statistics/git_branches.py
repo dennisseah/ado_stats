@@ -5,7 +5,7 @@ from services.git_repositories import fetch as fetch_repositories
 from utils.display import Table, as_table_group
 
 
-def generate(settings: Azdo_Settings):
+def generate(settings: Azdo_Settings, streamlit: bool = False):
     repos = fetch_repositories(settings=settings)
 
     branches: list[GitBranch] = []
@@ -25,4 +25,5 @@ def generate(settings: Azdo_Settings):
         tables=[
             Table(title="Git branches", headers=["repo", "name", "creator"], data=data)
         ],
+        streamlit=streamlit,
     )

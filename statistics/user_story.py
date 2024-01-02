@@ -6,7 +6,7 @@ from services.user_stories import fetch as fetch_stories
 from utils.display import Table, as_table_group
 
 
-def generate(settings: Azdo_Settings):
+def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     user_stories = fetch_stories(settings)
 
     tables = [
@@ -20,4 +20,4 @@ def generate(settings: Azdo_Settings):
         ),
     ]
 
-    as_table_group(group_name="User Stories", tables=tables)
+    as_table_group(group_name=title, tables=tables, streamlit=streamlit)

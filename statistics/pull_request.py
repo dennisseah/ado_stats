@@ -88,7 +88,7 @@ def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]) -> Table:
     )
 
 
-def generate(settings: Azdo_Settings):
+def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     settings = Azdo_Settings.model_validate({})
     repos = fetch_repositories(settings)
     total = []
@@ -116,4 +116,4 @@ def generate(settings: Azdo_Settings):
         )
     )
 
-    as_table_group(group_name="Pull requests", tables=tables)
+    as_table_group(group_name=title, tables=tables, streamlit=streamlit)

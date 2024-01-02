@@ -1,3 +1,5 @@
+import logging
+
 import requests
 
 from configurations.azdo_settings import Azdo_Settings
@@ -11,8 +13,11 @@ def fetch(
     settings: Azdo_Settings,
     repo: str,
 ) -> list[GitBranch]:
-    branches = data_cache.get("Git Branches")
+    logging.info(f"[STARTED] Fetching branches for {repo}")
+
+    branches = data_cache.get(f"Git Branches {repo}")
     if branches:
+        logging.info(f"Found branches for {repo} in cache")
         return branches
 
     url = f"{settings.get_rest_base_uri()}/git/repositories/{repo}/refs"
@@ -31,7 +36,11 @@ def fetch(
             )
             for d in response.json()["value"]
         ]
-        data_cache.push(key="Git Branches", value=branches)
+        logging.info(f"Cache branches for {repo}.")
+        data_cache.push(key=f"Git Branches {repo}", value=branches)
+
+        logging.info(f"[COMPLETED] Fetching branches for {repo}")
         return branches
-    else:
-        raise ValueError("Cannot fetch data")
+
+    logging.error(f"Error fetching branches for {repo}: {response.text}")
+    raise ValueError("Cannot fetch data")

@@ -5,7 +5,7 @@ from services.bugs import fetch as fetch_bugs
 from utils.display import as_table_group
 
 
-def generate(settings: Azdo_Settings):
+def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     bugs = fetch_bugs(settings)
 
     tables = [
@@ -14,4 +14,4 @@ def generate(settings: Azdo_Settings):
         aggr_accumulated(title="Accumulated bugs", data=bugs),
     ]
 
-    as_table_group(group_name="Bugs", tables=tables)
+    as_table_group(group_name=title, tables=tables, streamlit=streamlit)

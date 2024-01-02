@@ -7,8 +7,8 @@ from utils.display import Table
 def aggr_state(title: str, data: list[Any]) -> Table:
     return Table(
         title=title,
-        headers=["state", "count"],
-        data=aggr_count(data=data, dimension="state"),
+        headers=["state", "count", "percentage"],
+        data=aggr_count(data=data, dimension="state", include_percentage=True),
     )
 
 
@@ -68,7 +68,7 @@ def lifecycle(title: str, data: list[Any]) -> Table:
     assigned = aggr_count(data=data, dimension="assigned_to")
     closed_by = aggr_count(data=data, dimension="closed_by")
     removed_by = aggr_count([us for us in data if us.state == "Removed"], "changed_by")
-    merged = merge([created_by, assigned, closed_by, removed_by])
+    merged = merge(data=[created_by, assigned, closed_by, removed_by])
     merged.sort(key=lambda x: x[1], reverse=True)
 
     return Table(

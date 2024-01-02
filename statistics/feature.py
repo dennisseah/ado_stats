@@ -5,7 +5,7 @@ from services.features import fetch as fetch_features
 from utils.display import as_table_group
 
 
-def generate(settings: Azdo_Settings):
+def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     features = fetch_features(settings)
 
     tables = [
@@ -14,4 +14,4 @@ def generate(settings: Azdo_Settings):
         aggr_accumulated(title="Accumulated features", data=features),
     ]
 
-    as_table_group(group_name="Features", tables=tables)
+    as_table_group(group_name=title, tables=tables, streamlit=streamlit)

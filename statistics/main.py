@@ -5,15 +5,46 @@ from statistics.pull_request import generate as generate_pull_request
 from statistics.task import generate as generate_task
 from statistics.user_story import generate as generate_user_story
 
+import streamlit as st
+
 from configurations.azdo_settings import Azdo_Settings
+
+with_st = True
+
+# command for streamlit and without streamlit respectively:
+#
+# `python -m streamlit run statistics/main.py`
+# `python -m statistics.main`
+
 
 if __name__ == "__main__":
     settings = Azdo_Settings.model_validate({})
 
-    generate_feature(settings)
-    generate_milestone(settings)
-    generate_user_story(settings)
-    generate_task(settings)
-    generate_bug(settings)
-    generate_pull_request(settings)
-    print()
+    titles = [
+        "Milestones",
+        "Features",
+        "User Stories",
+        "Tasks",
+        "Bugs",
+        "Pull Requests",
+    ]
+
+    tabs = tabs = st.tabs(titles) if with_st else []
+
+    for i, genr in enumerate(
+        [
+            generate_milestone,
+            generate_feature,
+            generate_user_story,
+            generate_task,
+            generate_bug,
+            generate_pull_request,
+            # generate_git_branches,
+        ]
+    ):
+        if with_st:
+            tab = tabs[i]
+            with tab:  # type: ignore
+                genr(settings=settings, title=titles[i], streamlit=True)
+        else:
+            genr(settings=settings, title=titles[i])

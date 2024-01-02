@@ -1,7 +1,7 @@
 from typing import Any
 
 
-def merge(data: list[list[tuple[str, int]]]):
+def merge(data: list[list[tuple]]) -> list[tuple]:
     base = set()
     for d in data:
         base = base.union(set([x[0] for x in d]))
@@ -17,15 +17,31 @@ def merge(data: list[list[tuple[str, int]]]):
 
 
 def aggr_count(
-    data: list[Any], dimension: str, sort_values=True
-) -> list[tuple[str, int]]:
+    data: list[Any], dimension: str, sort_values=True, include_percentage=False
+) -> list[tuple]:
     dimensions = set([getattr(d, dimension) for d in data])
 
-    results = [
-        (dim, len([d for d in data if getattr(d, dimension) == dim]))
-        for dim in dimensions
-        if dim is not None
-    ]
+    if include_percentage:
+        ttl = len(data)
+        results = [
+            (
+                dim,
+                len([d for d in data if getattr(d, dimension) == dim]),
+                f"""{round(
+                    (len([d for d in data if getattr(d, dimension) == dim]) / ttl)
+                    * 100,
+                    2,
+                )}%""",
+            )
+            for dim in dimensions
+            if dim is not None
+        ]
+    else:
+        results = [
+            (dim, len([d for d in data if getattr(d, dimension) == dim]))
+            for dim in dimensions
+            if dim is not None
+        ]
 
     if sort_values:
         results.sort(key=lambda x: x[1])

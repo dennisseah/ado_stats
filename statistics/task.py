@@ -5,7 +5,7 @@ from services.tasks import fetch as fetch_tasks
 from utils.display import as_table_group
 
 
-def generate(settings: Azdo_Settings):
+def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     tasks = fetch_tasks(settings)
 
     tables = [
@@ -14,4 +14,4 @@ def generate(settings: Azdo_Settings):
         aggr_accumulated(title="Accumulated tasks", data=tasks),
     ]
 
-    as_table_group(group_name="Tasks", tables=tables)
+    as_table_group(group_name=title, tables=tables, streamlit=streamlit)

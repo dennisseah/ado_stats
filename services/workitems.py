@@ -1,3 +1,4 @@
+import logging
 from typing import Any, Callable
 
 import requests
@@ -14,6 +15,8 @@ def divide_chunks(data: list[str], n):
 
 
 def get_ids(settings: Azdo_Settings, kind: str) -> list[str]:
+    logging.info(f"[STARTED] Fetching {kind} ids")
+
     url = f"{settings.get_rest_base_uri()}/wit/wiql?api-version=7.0&$top=5000"
     filter = f"[System.WorkItemType] = '{kind}'"
     area_paths = settings.get_area_paths()
@@ -34,30 +37,39 @@ def get_ids(settings: Azdo_Settings, kind: str) -> list[str]:
 
     if response.status_code == 200:
         work_items = response.json()["workItems"]
+
+        logging.info(f"[COMPLETED] Fetching {kind} ids")
         return [str(work_item["id"]) for work_item in work_items]
 
+    logging.error(f"Error fetching {kind} ids: {response.text}")
     raise ValueError(response.text)
 
 
 def fetch_work_items(
     settings: Azdo_Settings, item_ids: list[str], creator: Callable
 ) -> list[Any]:
+    logging.info(f"[STARTED] Fetching work items {item_ids}")
+
     ids = ",".join(item_ids)
     url = f"{settings.get_rest_base_uri()}/wit/workitems?ids={ids}&$expand=Relations&api-version=7.0"  # noqa E501
     response = requests.get(url, auth=("", settings.azdo_pat))
 
     if response.status_code == 200:
+        logging.info(f"[COMPLETED] Fetching work items {item_ids}")
         return [
             creator(val, settings.get_name_discard_str())
             for val in response.json()["value"]
         ]
 
+    logging.error(f"Error fetching work items {item_ids}: {response.text}")
     raise ValueError(response.text)
 
 
 def get_all_items(settings: Azdo_Settings, kind: str, creator: Callable) -> list[Any]:
+    logging.info(f"[STARTED] Fetching all {kind}")
     items = data_cache.get(kind)
     if items:
+        logging.info(f"Found {kind} in cache")
         return items
 
     item_ids = get_ids(settings=settings, kind=kind)
@@ -66,5 +78,8 @@ def get_all_items(settings: Azdo_Settings, kind: str, creator: Callable) -> list
     for chunk in divide_chunks(item_ids, 200):
         items += fetch_work_items(settings=settings, item_ids=chunk, creator=creator)
 
+    logging.info(f"Cache {kind}.")
     data_cache.push(key=kind, value=items)
+
+    logging.info(f"[COMPLETED] Fetching all {kind}")
     return items
