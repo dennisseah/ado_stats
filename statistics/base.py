@@ -28,9 +28,12 @@ def aggr_accumulated(title: str, data: list[Any]) -> Table:
     for x in removed.keys():
         if x not in created_weeks:
             aggr_created.append((x, 0))
+
+    created_weeks = [x[0] for x in aggr_created]
     for x in closed.keys():
         if x not in created_weeks:
             aggr_created.append((x, 0))
+
     aggr_created.sort(key=lambda x: x[0])
 
     results = []
