@@ -2,6 +2,7 @@ import logging
 
 import requests
 
+import configurations.api as cfg_api
 from configurations.azdo_settings import Azdo_Settings
 from models.pull_request import PullRequest
 from utils.data_cache import DataCache
@@ -18,7 +19,7 @@ def fetch_pull_requests(
     logging.info(f"[STARTED] Fetching pull requests for {repo}")
 
     url = f"{settings.get_rest_base_uri()}/git/repositories/{repo}/pullrequests"
-    params: dict[str, str | int] = {"api-version": "7.0", "$skip": skip}
+    params: dict[str, str | int] = {**cfg_api.VERSION, **{"$skip": skip}}
     if not active_only:
         params["searchCriteria.status"] = "all"
 

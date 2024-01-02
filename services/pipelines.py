@@ -2,6 +2,7 @@ import logging
 
 import requests
 
+import configurations.api as cfg_api
 from configurations.azdo_settings import Azdo_Settings
 from models.pipeline import Pipeline, PipelineRun
 
@@ -10,7 +11,7 @@ def fetch_ids(settings: Azdo_Settings) -> list[Pipeline]:
     logging.info("[STARTED] Fetching pipeline ids")
 
     url = f"{settings.get_rest_base_uri()}/pipelines"
-    params: dict[str, str | int] = {"api-version": "7.0"}
+    params: dict[str, str] = cfg_api.VERSION
 
     response = requests.get(url, params=params, auth=("", settings.azdo_pat))
 
@@ -26,7 +27,7 @@ def fetch_runs(settings: Azdo_Settings, pipeline_id: str) -> list[PipelineRun]:
     logging.info(f"[STARTED] Fetching pipeline runs for {pipeline_id}")
 
     url = f"{settings.get_rest_base_uri()}/pipelines/{pipeline_id}/runs"
-    params: dict[str, str | int] = {"api-version": "7.0"}
+    params: dict[str, str] = cfg_api.VERSION
 
     response = requests.get(url, params=params, auth=("", settings.azdo_pat))
 

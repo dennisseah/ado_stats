@@ -1,5 +1,6 @@
 from statistics.bug import generate as generate_bug
 from statistics.feature import generate as generate_feature
+from statistics.git_branches import generate as generate_git_branches
 from statistics.milestone import generate as generate_milestone
 from statistics.pipeline import generate as generate_pipeline
 from statistics.pull_request import generate as generate_pull_request
@@ -29,6 +30,7 @@ if __name__ == "__main__":
         "Bugs",
         "Pull Requests",
         "Pipelines",
+        "Git Branches",
     ]
 
     tabs = tabs = st.tabs(titles) if with_st else []
@@ -42,7 +44,7 @@ if __name__ == "__main__":
             generate_bug,
             generate_pull_request,
             generate_pipeline,
-            # generate_git_branches,
+            generate_git_branches,
         ]
     ):
         if with_st:

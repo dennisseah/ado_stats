@@ -3,6 +3,7 @@ from typing import Any, Callable
 
 import requests
 
+import configurations.api as cfg_api
 from configurations.azdo_settings import Azdo_Settings
 from utils.data_cache import DataCache
 
@@ -17,7 +18,8 @@ def divide_chunks(data: list[str], n):
 def get_ids(settings: Azdo_Settings, kind: str) -> list[str]:
     logging.info(f"[STARTED] Fetching {kind} ids")
 
-    url = f"{settings.get_rest_base_uri()}/wit/wiql?api-version=7.0&$top=5000"
+    api_params = "&".join([f"{k}={v}" for k, v in cfg_api.VERSION.items()])
+    url = f"{settings.get_rest_base_uri()}/wit/wiql?{api_params}&$top=5000"
     filter = f"[System.WorkItemType] = '{kind}'"
     area_paths = settings.get_area_paths()
 
@@ -51,7 +53,8 @@ def fetch_work_items(
     logging.info(f"[STARTED] Fetching work items {item_ids}")
 
     ids = ",".join(item_ids)
-    url = f"{settings.get_rest_base_uri()}/wit/workitems?ids={ids}&$expand=Relations&api-version=7.0"  # noqa E501
+    api_params = "&".join([f"{k}={v}" for k, v in cfg_api.VERSION.items()])
+    url = f"{settings.get_rest_base_uri()}/wit/workitems?ids={ids}&$expand=Relations&{api_params}"  # noqa E501
     response = requests.get(url, auth=("", settings.azdo_pat))
 
     if response.status_code == 200:
