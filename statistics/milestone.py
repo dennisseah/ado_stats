@@ -15,7 +15,7 @@ def aggr_milestones(data: list[UserStory]):
         )
 
     results = [(k, v) for k, v in milestones.items()]
-    results.sort(key=lambda x: x[1], reverse=True)
+    results.sort(key=lambda x: x[0])
     return results
 
 
@@ -23,7 +23,7 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     user_stories = [
         x
         for x in fetch_stories(settings)
-        if x.milestone and x.state != "Removed" and x.assigned_to is not None
+        if x.milestone and (x.state == "Closed" or x.state == "Active")
     ]
     points = aggr_milestones(data=user_stories)
     as_table_group(
