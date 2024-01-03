@@ -35,7 +35,7 @@ def as_table_group(
             tab_objs = st.tabs([tbl.title for tbl in tables])
 
             for i, tab in enumerate(tab_objs):
-                with tab_objs[i]:
+                with tab:
                     st.dataframe(
                         data=tables[i].to_dataframe(),
                         hide_index=True,
