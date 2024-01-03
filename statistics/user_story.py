@@ -10,14 +10,14 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     user_stories = fetch_stories(settings)
 
     tables = [
-        aggr_state(title="User Stories by states", data=user_stories),
-        lifecycle(title="User Story Counts", data=user_stories),
-        aggr_accumulated(title="Accumulated User Stories", data=user_stories),
+        aggr_state(title="By States", data=user_stories),
+        lifecycle(title="Counts", data=user_stories),
+        aggr_accumulated(title="Accumulated", data=user_stories),
         Table(
-            title="User Stories by story points",
+            title="By Story Points",
             headers=["points", "count"],
             data=aggr_utils.aggr_count(user_stories, "story_points"),
         ),
     ]
 
-    as_table_group(group_name=title, tables=tables, streamlit=streamlit)
+    as_table_group(group_name=title, tables=tables, tabs=True, streamlit=streamlit)

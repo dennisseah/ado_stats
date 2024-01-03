@@ -10,7 +10,10 @@ def validate(settings: Azdo_Settings):
     active_tasks = [
         t
         for t in tasks
-        if t.parent_id is not None and t.state != "Closed" and t.state != "Removed"
+        if t.parent_id is not None
+        and t.state != "Closed"
+        and t.state != "Resolved"
+        and t.state != "Removed"
     ]
     parent_ids = list(set([t.parent_id for t in active_tasks]))
     user_stories = fetch_work_items(
@@ -19,7 +22,7 @@ def validate(settings: Azdo_Settings):
     closed_stories = [
         (us.id, us.created_by)
         for us in user_stories
-        if us.state == "Closed" or us.state == "Removed"
+        if us.state == "Closed" or us.state == "Removed" or us.state == "Resolved"
     ]
 
     results = []

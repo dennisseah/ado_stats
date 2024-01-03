@@ -9,9 +9,9 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     features = fetch_features(settings)
 
     tables = [
-        aggr_state(title="Feature by states", data=features),
-        lifecycle(title="Feature Counts", data=features),
-        aggr_accumulated(title="Accumulated features", data=features),
+        aggr_state(title="By States", data=features),
+        lifecycle(title="Counts", data=features),
+        aggr_accumulated(title="Accumulated", data=features),
     ]
 
-    as_table_group(group_name=title, tables=tables, streamlit=streamlit)
+    as_table_group(group_name=title, tables=tables, tabs=True, streamlit=streamlit)

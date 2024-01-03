@@ -9,9 +9,9 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     bugs = fetch_bugs(settings)
 
     tables = [
-        aggr_state(title="Bug by states", data=bugs),
-        lifecycle(title="Bug Counts", data=bugs),
-        aggr_accumulated(title="Accumulated bugs", data=bugs),
+        aggr_state(title="By States", data=bugs),
+        lifecycle(title="Counts", data=bugs),
+        aggr_accumulated(title="Accumulated", data=bugs),
     ]
 
-    as_table_group(group_name=title, tables=tables, streamlit=streamlit)
+    as_table_group(group_name=title, tables=tables, tabs=True, streamlit=streamlit)

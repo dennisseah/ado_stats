@@ -10,7 +10,7 @@ def validate(settings: Azdo_Settings):
     features = [
         f
         for f in fetch_features(settings)
-        if f.state != "Closed" and f.state != "Removed"
+        if f.state != "Closed" and f.state != "Removed" and f.state != "Resolved"
     ]
 
     child_ids = []

@@ -98,22 +98,18 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
 
     for repo in repos:
         prs = fetch_pull_requests(settings, repo)
-        tables.append(
-            tbl(title=f"found {len(prs)} pull requests for {repo}", data=aggr(prs))
-        )
+        tables.append(tbl(title=repo, data=aggr(prs)))
         merge_times.append(time_to_merge(repo, prs))
         total += prs
 
-    tables.append(
-        tbl(title=f"found {len(total)} pull requests in total", data=aggr(total))
-    )
+    tables.append(tbl(title="total", data=aggr(total)))
 
     tables.append(
         Table(
-            title="days to merge pull requests",
+            title="days to merge",
             headers=["repo", "mean", "median", "max", "min"],
             data=merge_times,
         )
     )
 
-    as_table_group(group_name=title, tables=tables, streamlit=streamlit)
+    as_table_group(group_name=title, tables=tables, tabs=True, streamlit=streamlit)

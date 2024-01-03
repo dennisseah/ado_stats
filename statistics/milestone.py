@@ -35,7 +35,8 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     user_stories = [
         x
         for x in fetch_stories(settings)
-        if x.milestone and (x.state == "Closed" or x.state == "Active")
+        if x.milestone
+        and (x.state == "Closed" or x.state == "Resolved" or x.state == "Active")
     ]
 
     points = aggr_milestones(data=user_stories, milestones=get_milestones(settings))
@@ -44,7 +45,7 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
         tables=[
             Table(
                 title="Story points by milestone",
-                headers=["milestone", "points"],
+                headers=["milestone", "start", "finish", "points"],
                 data=points,
             )
         ],

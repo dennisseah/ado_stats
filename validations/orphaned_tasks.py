@@ -8,7 +8,10 @@ def validate(settings: Azdo_Settings):
     orphaned_tasks = [
         t
         for t in tasks
-        if t.parent_id is None and t.state != "Closed" and t.state != "Removed"
+        if t.parent_id is None
+        and t.state != "Closed"
+        and t.state != "Resolved"
+        and t.state != "Removed"
     ]
     as_table(
         Table(

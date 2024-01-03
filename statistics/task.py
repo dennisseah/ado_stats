@@ -9,9 +9,9 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     tasks = fetch_tasks(settings)
 
     tables = [
-        aggr_state(title="Task by states", data=tasks),
-        lifecycle(title="Task Counts", data=tasks),
-        aggr_accumulated(title="Accumulated tasks", data=tasks),
+        aggr_state(title="By States", data=tasks),
+        lifecycle(title="Counts", data=tasks),
+        aggr_accumulated(title="Accumulated", data=tasks),
     ]
 
-    as_table_group(group_name=title, tables=tables, streamlit=streamlit)
+    as_table_group(group_name=title, tables=tables, tabs=True, streamlit=streamlit)

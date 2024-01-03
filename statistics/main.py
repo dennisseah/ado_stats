@@ -33,7 +33,7 @@ if __name__ == "__main__":
         "Git Branches",
     ]
 
-    tabs = tabs = st.tabs(titles) if with_st else []
+    tabs = st.tabs(titles) if with_st else []
 
     for i, genr in enumerate(
         [
