@@ -6,13 +6,9 @@ import requests
 import configurations.api as cfg_api
 from configurations.azdo_settings import Azdo_Settings
 from utils.data_cache import DataCache
+from utils.data_utils import divide_chunks
 
 data_cache = DataCache()
-
-
-def divide_chunks(data: list[str], n):
-    for i in range(0, len(data), n):
-        yield data[i : i + n]
 
 
 def get_ids(settings: Azdo_Settings, kind: str) -> list[str]:

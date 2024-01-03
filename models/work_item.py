@@ -27,6 +27,7 @@ class WorkItem(BaseModel):
     closed_by: str | None
     assigned_to: str | None
     parent_id: str | None
+    child_ids: list[str] = []
 
     @classmethod
     def from_data(cls, data: dict[str, Any], discard_name_str: list[str]) -> "WorkItem":
@@ -51,6 +52,12 @@ class WorkItem(BaseModel):
         )
         parent_url = parent.get("url") if parent else None
         parent_id = parent_url.split("/")[-1] if parent_url else None
+
+        child_ids = [
+            x["url"].split("/")[-1]
+            for x in data.get("relations", [])
+            if x.get("attributes", {}).get("name", "") == "Child"
+        ]
 
         def fmt_name(field_name: str) -> str | None:
             return (
@@ -85,4 +92,5 @@ class WorkItem(BaseModel):
             closed_week=closed_week,
             closed_by=fmt_name("Microsoft.VSTS.Common.ClosedBy"),
             parent_id=parent_id,
+            child_ids=child_ids,
         )
