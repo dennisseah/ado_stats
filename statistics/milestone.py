@@ -14,30 +14,47 @@ def get_milestones(settings: Azdo_Settings) -> dict[str, Milestone]:
 
 
 def aggr_milestones(data: list[UserStory], milestones: dict[str, Milestone]):
-    points = defaultdict(int)
+    points = {
+        "open": defaultdict(int),
+        "closed": defaultdict(int),
+    }
 
     for story in data:
-        points[story.milestone] += story.story_points if story.story_points > 0 else 3
+        if story.state == "Closed" or story.state == "Resolved":
+            points["closed"][story.milestone] += (
+                story.story_points if story.story_points > 0 else 5
+            )
+        else:
+            points["open"][story.milestone] += (
+                story.story_points if story.story_points > 0 else 5
+            )
 
     results = []
-    for mstone, points in points.items():
-        ms = milestones.get(mstone)
-        if ms:
-            results.append((ms.name, str(ms.start_date), str(ms.finish_date), points))
-        else:
-            results.append((mstone, "", "", points))
+    for ms, milestone in milestones.items():
+        results.append(
+            (
+                milestone.name,
+                (
+                    milestone.start_date.strftime("%Y-%m-%d")
+                    if milestone.start_date
+                    else ""
+                ),
+                (
+                    milestone.finish_date.strftime("%Y-%m-%d")
+                    if milestone.finish_date
+                    else ""
+                ),
+                points["open"].get(ms, 0),
+                points["closed"].get(ms, 0),
+            )
+        )
 
     results.sort(key=lambda x: (x[1], x[0]))
     return results
 
 
 def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
-    user_stories = [
-        x
-        for x in fetch_stories(settings)
-        if x.milestone
-        and (x.state == "Closed" or x.state == "Resolved" or x.state == "Active")
-    ]
+    user_stories = [x for x in fetch_stories(settings) if x.milestone]
 
     points = aggr_milestones(data=user_stories, milestones=get_milestones(settings))
     as_table_group(
@@ -45,7 +62,13 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
         tables=[
             Table(
                 title="Story points by milestone",
-                headers=["milestone", "start", "finish", "points"],
+                headers=[
+                    "milestone",
+                    "start",
+                    "finish",
+                    "active",
+                    "resolved",
+                ],
                 data=points,
             )
         ],

@@ -3,7 +3,6 @@ from typing import Any, Callable
 
 import requests
 
-import configurations.api as cfg_api
 from configurations.azdo_settings import Azdo_Settings
 from utils.data_cache import DataCache
 from utils.data_utils import divide_chunks
@@ -14,8 +13,8 @@ data_cache = DataCache()
 def get_ids(settings: Azdo_Settings, kind: str) -> list[str]:
     logging.info(f"[STARTED] Fetching {kind} ids")
 
-    api_params = "&".join([f"{k}={v}" for k, v in cfg_api.VERSION.items()])
-    url = f"{settings.get_rest_base_uri()}/wit/wiql?{api_params}&$top=5000"
+    # api_params = "&".join([f"{k}={v}" for k, v in cfg_api.VERSION.items()])
+    url = f"{settings.get_rest_base_uri()}/wit/wiql?$top=5000"
     filter = f"[System.WorkItemType] = '{kind}'"
     area_paths = settings.get_area_paths()
 
@@ -31,6 +30,7 @@ def get_ids(settings: Azdo_Settings, kind: str) -> list[str]:
         url,
         auth=("", settings.azdo_pat),
         json=body,
+        headers={"Accept": "application/json; api-version=7.0"},
     )
 
     if response.status_code == 200:
@@ -49,9 +49,12 @@ def fetch_work_items(
     logging.info(f"[STARTED] Fetching work items {item_ids}")
 
     ids = ",".join(item_ids)
-    api_params = "&".join([f"{k}={v}" for k, v in cfg_api.VERSION.items()])
-    url = f"{settings.get_rest_base_uri()}/wit/workitems?ids={ids}&$expand=Relations&{api_params}"  # noqa E501
-    response = requests.get(url, auth=("", settings.azdo_pat))
+    url = f"{settings.get_rest_base_uri()}/wit/workitems?ids={ids}&$expand=Relations"  # noqa E501
+    response = requests.get(
+        url,
+        auth=("", settings.azdo_pat),
+        headers={"Accept": "application/json; api-version=7.0"},
+    )
 
     if response.status_code == 200:
         logging.info(f"[COMPLETED] Fetching work items {item_ids}")

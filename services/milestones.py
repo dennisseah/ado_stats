@@ -2,7 +2,6 @@ import logging
 
 import requests
 
-import configurations.api as cfg_api
 from configurations.azdo_settings import Azdo_Settings
 from models.milestone import Milestone
 from utils.data_cache import DataCache
@@ -21,8 +20,11 @@ def fetch(
         return milestones
 
     url = f"{settings.get_rest_base_uri()}/work/teamsettings/iterations"
-    params: dict[str, str] = cfg_api.VERSION
-    response = requests.get(url, params=params, auth=("", settings.azdo_pat))
+    response = requests.get(
+        url,
+        auth=("", settings.azdo_pat),
+        headers={"Accept": "application/json; api-version=7.0"},
+    )
 
     if response.status_code == 200:
         return [Milestone.from_data(r) for r in response.json()["value"]]
