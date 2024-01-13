@@ -102,7 +102,8 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
         merge_times.append(time_to_merge(repo, prs))
         total += prs
 
-    tables.append(tbl(title="total", data=aggr(total)))
+    if len(repos) > 1:
+        tables.append(tbl(title="total", data=aggr(total)))
 
     tables.append(
         Table(

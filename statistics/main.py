@@ -10,15 +10,13 @@ import streamlit as st
 
 from configurations.azdo_settings import Azdo_Settings
 
-with_st = False
-
 # command for streamlit and without streamlit respectively:
 #
 # `python -m streamlit run statistics/main.py`
 # `python -m statistics.main`
 
 
-if __name__ == "__main__":
+def main(with_st: bool = False):
     settings = Azdo_Settings.model_validate({})
 
     titles = [
@@ -52,3 +50,10 @@ if __name__ == "__main__":
                 genr(settings=settings, title=titles[i], streamlit=True)
         else:
             genr(settings=settings, title=titles[i])
+
+
+if __name__ == "__main__":
+    import sys
+
+    with_st = "statistics/main.py" == sys.argv[0]
+    main(with_st=with_st)
