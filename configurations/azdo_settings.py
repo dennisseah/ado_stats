@@ -1,6 +1,6 @@
 import urllib.parse as parser
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Azdo_Settings(BaseSettings):
@@ -13,9 +13,11 @@ class Azdo_Settings(BaseSettings):
     repos_ignore: str | None = None
     name_discard_str: str | None = None
 
-    class Config:
-        env_file = ".env"
-        extra = "ignore"
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        extra="ignore",
+        case_sensitive=False,
+    )
 
     def get_area_paths(self) -> list[str]:
         """Area paths are comma separated values. This method returns a list of area

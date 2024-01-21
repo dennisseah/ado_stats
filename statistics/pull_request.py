@@ -89,7 +89,6 @@ def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]) -> Table:
 
 
 def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
-    settings = Azdo_Settings.model_validate({})
     repos = fetch_repositories(settings)
     total = []
     merge_times = []
