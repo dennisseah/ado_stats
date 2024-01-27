@@ -1,5 +1,7 @@
 from collections import defaultdict
 
+import pandas as pd
+
 from configurations.azdo_settings import Azdo_Settings
 from models.milestone import Milestone
 from models.user_story import UserStory
@@ -53,6 +55,15 @@ def aggr_milestones(data: list[UserStory], milestones: dict[str, Milestone]):
     return results
 
 
+def plot_chart(df: pd.DataFrame):
+    plot_bar_chart(
+        df=df,
+        x_column="milestone",
+        id_vars=["milestone"],
+        value_vars=["active", "resolved"],
+    )
+
+
 def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     user_stories = [x for x in fetch_stories(settings) if x.milestone]
 
@@ -62,14 +73,7 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
         headers=["milestone", "start", "finish", "active", "resolved"],
         data=points,
         height=400,
+        streamlit_chart=plot_chart,
     )
-
-    if streamlit:
-        plot_bar_chart(
-            df=tbl.to_dataframe(),
-            x_column="milestone",
-            id_vars=["milestone"],
-            value_vars=["active", "resolved"],
-        )
 
     as_table_group(group_name=title, tables=[tbl], streamlit=streamlit)

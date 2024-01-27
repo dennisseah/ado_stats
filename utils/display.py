@@ -85,18 +85,27 @@ def plot_bar_chart(
     src = df.melt(id_vars=id_vars, value_vars=value_vars)
 
     chart = (
-        alt.Chart(src)
+        alt.Chart(src, height=400, width=80)
         .mark_bar(strokeWidth=100)
         .encode(
             x=alt.X(
                 "variable:N", title="", scale=alt.Scale(paddingOuter=0.5), axis=None
             ),
             y="value:Q",
-            color="variable:N",
+            color=alt.Color(
+                "variable:N",
+                legend=alt.Legend(
+                    orient="none",
+                    legendX=130,
+                    legendY=-80,
+                    direction="horizontal",
+                    titleAnchor="middle",
+                ),
+            ),
             column=alt.Column(f"{x_column}:N", title="", spacing=0),
         )
         .configure_header(labelOrient="bottom")  # type: ignore
         .configure_view(strokeOpacity=0)
     )
 
-    st.altair_chart(chart)
+    st.altair_chart(chart, use_container_width=False)
