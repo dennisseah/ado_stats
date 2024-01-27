@@ -1,12 +1,13 @@
 from collections import defaultdict
 
+import pandas as pd
 from pydantic import BaseModel
 
 from configurations.azdo_settings import Azdo_Settings
 from models.pull_request import PullRequest
 from services.git_repositories import fetch as fetch_repositories
 from services.pull_requests import fetch as fetch_pull_requests
-from utils.display import Table, as_table_group
+from utils.display import Table, as_table_group, plot_bar_chart
 
 
 class CountItem(BaseModel):
@@ -73,17 +74,41 @@ def time_to_merge(
     )
 
 
+def streamlit_chart(df: pd.DataFrame):
+    plot_bar_chart(
+        df=df, x_column="week", id_vars=["week"], value_vars=["created", "closed"]
+    )
+
+
+def by_week(title: str, results: list[PullRequest]) -> Table:
+    weeks = set([r.created_week for r in results])
+    for result in results:
+        if result.closed_week:
+            weeks.add(result.closed_week)
+    weeks = weeks = sorted(list(weeks))
+
+    data = [
+        (
+            week,
+            len([r for r in results if r.created_week == week]),
+            len([r for r in results if r.closed_week == week]),
+        )
+        for week in weeks
+    ]
+
+    return Table(
+        title=title,
+        headers=["week", "created", "closed"],
+        data=data,
+        height=400,
+        streamlit_chart=streamlit_chart,
+    )
+
+
 def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]) -> Table:
     return Table(
         title=title,
-        headers=[
-            "engineer",
-            "created",
-            "active",
-            "completed",
-            "abandoned",
-            "reviewed",
-        ],
+        headers=["engineer", "created", "active", "completed", "abandoned", "reviewed"],
         data=data,
     )
 
@@ -98,6 +123,7 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     for repo in repos:
         prs = fetch_pull_requests(settings, repo)
         tables.append(tbl(title=repo, data=aggr(prs)))
+        tables.append(by_week(title=repo, results=prs))
         merge_times.append(time_to_merge(repo, prs))
         total += prs
 

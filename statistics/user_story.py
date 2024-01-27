@@ -1,9 +1,25 @@
 from statistics.base import aggr_accumulated, aggr_state, lifecycle
 
+import matplotlib.pyplot as plt
+import pandas as pd
+import streamlit as st
+
 import utils.aggr_utils as aggr_utils
 from configurations.azdo_settings import Azdo_Settings
 from services.user_stories import fetch as fetch_stories
 from utils.display import Table, as_table_group
+
+
+def pie_chart(df: pd.DataFrame):
+    data = df.to_dict("list")
+    fig = plt.figure(figsize=(4, 3))
+    plt.pie(
+        data["count"],
+        labels=data["points"],
+        autopct="%1.1f%%",
+        textprops={"fontsize": 5},
+    )
+    st.pyplot(fig.figure, use_container_width=False)
 
 
 def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
@@ -17,6 +33,8 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
             title="By Story Points",
             headers=["points", "count"],
             data=aggr_utils.aggr_count(user_stories, "story_points"),
+            height=200,
+            streamlit_chart=pie_chart,
         ),
     ]
 

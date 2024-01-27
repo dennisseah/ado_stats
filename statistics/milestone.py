@@ -5,7 +5,7 @@ from models.milestone import Milestone
 from models.user_story import UserStory
 from services.milestones import fetch as fetch_milestones
 from services.user_stories import fetch as fetch_stories
-from utils.display import Table, as_table_group
+from utils.display import Table, as_table_group, plot_bar_chart
 
 
 def get_milestones(settings: Azdo_Settings) -> dict[str, Milestone]:
@@ -57,20 +57,19 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     user_stories = [x for x in fetch_stories(settings) if x.milestone]
 
     points = aggr_milestones(data=user_stories, milestones=get_milestones(settings))
-    as_table_group(
-        group_name=title,
-        tables=[
-            Table(
-                title="Story points by milestone",
-                headers=[
-                    "milestone",
-                    "start",
-                    "finish",
-                    "active",
-                    "resolved",
-                ],
-                data=points,
-            )
-        ],
-        streamlit=streamlit,
+    tbl = Table(
+        title="Story points by milestone",
+        headers=["milestone", "start", "finish", "active", "resolved"],
+        data=points,
+        height=400,
     )
+
+    if streamlit:
+        plot_bar_chart(
+            df=tbl.to_dataframe(),
+            x_column="milestone",
+            id_vars=["milestone"],
+            value_vars=["active", "resolved"],
+        )
+
+    as_table_group(group_name=title, tables=[tbl], streamlit=streamlit)

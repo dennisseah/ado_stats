@@ -3,7 +3,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
-from utils.date_utils import to_date
+from utils.date_utils import to_date, to_week
 from utils.name_formatter import format_name
 
 
@@ -14,7 +14,9 @@ class PullRequest(BaseModel):
     merge_days: int | None
     created_by: str
     created_date: datetime
+    created_week: str
     closed_date: datetime | None = None
+    closed_week: str | None = None
     reviewers: list[str] = []
 
     @classmethod
@@ -26,7 +28,10 @@ class PullRequest(BaseModel):
             discard_str=discard_name_str,
         )
         d_create = to_date(data["creationDate"])
+        created_week = to_week(d_create)
+
         d_close = to_date(data.get("closedDate"))
+        closed_week = to_week(d_close) if d_close else None
 
         # created_date will never be None
         merge_days = (d_close - d_create).days if d_close else None  # type: ignore
@@ -43,6 +48,8 @@ class PullRequest(BaseModel):
             merge_days=merge_days,
             created_by=created_by,
             created_date=d_create,  # type: ignore
+            created_week=created_week,  # type: ignore
             closed_date=d_close,
+            closed_week=closed_week,
             reviewers=reviewers,
         )

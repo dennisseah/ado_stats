@@ -5,10 +5,27 @@ from utils.display import Table
 
 
 def aggr_state(title: str, data: list[Any]) -> Table:
+    import matplotlib.pyplot as plt
+    import pandas as pd
+    import streamlit as st
+
+    def pie_chart(df: pd.DataFrame):
+        data = df.to_dict("list")
+        fig = plt.figure(figsize=(4, 3))
+        plt.pie(
+            data["count"],
+            labels=data["state"],
+            autopct="%1.1f%%",
+            textprops={"fontsize": 5},
+        )
+        st.pyplot(fig.figure, use_container_width=False)
+
     return Table(
         title=title,
         headers=["state", "count", "percentage"],
         data=aggr_count(data=data, dimension="state", include_percentage=True),
+        height=250,
+        streamlit_chart=pie_chart,
     )
 
 
