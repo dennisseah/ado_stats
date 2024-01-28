@@ -72,7 +72,6 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
         title="Story points by milestone",
         headers=["milestone", "start", "finish", "active", "resolved"],
         data=points,
-        height=400,
         streamlit_chart=plot_chart,
     )
 

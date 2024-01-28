@@ -1,5 +1,8 @@
 from typing import Any
 
+import pandas as pd
+import streamlit as st
+
 from utils.aggr_utils import aggr_count, merge
 from utils.display import Table
 
@@ -20,11 +23,12 @@ def aggr_state(title: str, data: list[Any]) -> Table:
         )
         st.pyplot(fig.figure, use_container_width=False)
 
+    results = aggr_count(data=data, dimension="state", include_percentage=True)
+
     return Table(
         title=title,
         headers=["state", "count", "percentage"],
-        data=aggr_count(data=data, dimension="state", include_percentage=True),
-        height=250,
+        data=results,
         streamlit_chart=pie_chart,
     )
 
@@ -70,6 +74,9 @@ def aggr_accumulated(title: str, data: list[Any]) -> Table:
             )
         )
 
+    def plot_line_chart(df: pd.DataFrame):
+        st.line_chart(df, x="year - week", y="accumulated")
+
     return Table(
         title=title,
         headers=[
@@ -80,6 +87,7 @@ def aggr_accumulated(title: str, data: list[Any]) -> Table:
             "accumulated",
         ],
         data=results,
+        streamlit_chart=plot_line_chart,
     )
 
 

@@ -11,7 +11,6 @@ class Table(BaseModel):
     title: str
     headers: list[str]
     data: list[tuple]
-    height: int = 800
     streamlit_chart: Callable | None = None
 
     def to_dict(self):
@@ -43,6 +42,7 @@ def as_table_group(
             for i, tab in enumerate(tab_objs):
                 with tab:
                     tbl = tables[i]
+                    st.subheader(tbl.title)
                     if tbl.streamlit_chart:
                         tbl.streamlit_chart(tbl.to_dataframe())  # type: ignore
 
@@ -50,7 +50,7 @@ def as_table_group(
                         data=tbl.to_dataframe(),
                         hide_index=True,
                         width=600,
-                        height=tbl.height,
+                        height=min(800, 50 * len(tbl.data)),
                     )
         else:
             for tbl in tables:
@@ -62,7 +62,7 @@ def as_table_group(
                     data=tbl.to_dataframe(),
                     hide_index=True,
                     width=600,
-                    height=tbl.height,
+                    height=min(800, 50 * len(tbl.data)),
                 )
 
     else:

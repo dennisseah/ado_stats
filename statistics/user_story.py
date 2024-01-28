@@ -37,7 +37,6 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
             title="By Story Points",
             headers=["points", "count"],
             data=aggr_utils.aggr_count(user_stories, "story_points"),
-            height=200,
             streamlit_chart=pie_chart,
         ),
         Table(title="Orphaned Stories", headers=["id", "title"], data=orphan_stories),

@@ -100,7 +100,6 @@ def by_week(title: str, results: list[PullRequest]) -> Table:
         title=title,
         headers=["week", "created", "closed"],
         data=data,
-        height=400,
         streamlit_chart=streamlit_chart,
     )
 

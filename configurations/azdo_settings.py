@@ -12,6 +12,7 @@ class Azdo_Settings(BaseSettings):
     area_paths: str | None = None
     repos_ignore: str | None = None
     name_discard_str: str | None = None
+    crew: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

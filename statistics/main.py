@@ -30,6 +30,16 @@ def main(with_st: bool = False):
         "Git Branches",
     ]
 
+    if with_st:
+        st.markdown(f"**{settings.azdo_org_name}**")
+        if settings.crew:
+            st.markdown(settings.crew)
+    else:
+        print(settings.azdo_org_name)
+        if settings.crew:
+            print(settings.crew)
+        print()
+
     tabs = st.tabs(titles) if with_st else []
 
     for i, genr in enumerate(
