@@ -25,6 +25,10 @@ def pie_chart(df: pd.DataFrame):
 def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
     user_stories = fetch_stories(settings)
 
+    orphan_stories = [
+        (us.id, us.title) for us in filter(lambda us: not us.parent_id, user_stories)
+    ]
+
     tables = [
         aggr_state(title="By States", data=user_stories),
         lifecycle(title="Counts", data=user_stories),
@@ -36,6 +40,7 @@ def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
             height=200,
             streamlit_chart=pie_chart,
         ),
+        Table(title="Orphaned Stories", headers=["id", "title"], data=orphan_stories),
     ]
 
     as_table_group(group_name=title, tables=tables, tabs=True, streamlit=streamlit)
