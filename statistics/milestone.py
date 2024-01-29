@@ -5,7 +5,6 @@ import pandas as pd
 import streamlit as st
 
 from models.milestone import Milestone
-from models.user_story import UserStory
 from services.milestones import fetch as fetch_milestones
 from services.user_stories import fetch as fetch_stories
 from utils.display import Table, as_table_group
@@ -20,15 +19,14 @@ def get_milestones() -> dict[str, Milestone]:
     return {x.path: x for x in milestones}
 
 
-def aggr_milestones(
-    data: list[UserStory], milestones: dict[str, Milestone]
-) -> list[tuple[str, str, str, int, int]]:
+def aggr_milestones() -> list[tuple[str, str, str, str, int, int]]:
     """Aggregate story points by milestone.
 
-    :param data: The list of user stories.
     :param milestones: The list of milestones.
     :return: The aggregated story points.
     """
+    milestones = get_milestones()
+    user_stories = [x for x in fetch_stories() if x.milestone]
 
     def fmt_date(d: datetime | None) -> str:
         return d.strftime("%Y-%m-%d") if d else ""
@@ -38,7 +36,7 @@ def aggr_milestones(
         "closed": defaultdict(int),
     }
 
-    for story in data:
+    for story in user_stories:
         if story.state == "Closed" or story.state == "Resolved":
             points["closed"][story.milestone] += (
                 story.story_points if story.story_points > 0 else 5
@@ -48,9 +46,10 @@ def aggr_milestones(
                 story.story_points if story.story_points > 0 else 5
             )
 
-    def fmt_point(id: str, milestone: Milestone) -> tuple[str, str, str, int, int]:
+    def fmt_point(id: str, milestone: Milestone) -> tuple[str, str, str, str, int, int]:
         return (
             milestone.name,
+            milestone.timeframe,
             fmt_date(milestone.start_date),
             fmt_date(milestone.finish_date),
             points["open"].get(id, 0),
@@ -58,7 +57,7 @@ def aggr_milestones(
         )
 
     results = [fmt_point(id, milestone) for id, milestone in milestones.items()]
-    results.sort(key=lambda x: (x[1], x[0]))
+    results.sort(key=lambda x: (x[2], x[0]))
     return results
 
 
@@ -77,12 +76,11 @@ def generate(title: str, streamlit: bool = False):
     :param title: The title of the statistics.
     :param streamlit: Whether to display the statistics in Streamlit.
     """
-    user_stories = [x for x in fetch_stories() if x.milestone]
 
-    points = aggr_milestones(data=user_stories, milestones=get_milestones())
+    points = aggr_milestones()
     tbl = Table(
         title="Story points by milestone",
-        headers=["milestone", "start", "finish", "active", "resolved"],
+        headers=["milestone", "state", "start", "finish", "active", "resolved"],
         data=points,
         streamlit_chart=plot_chart,
     )

@@ -10,6 +10,7 @@ from utils.date_utils import to_date
 class Milestone(BaseModel):
     name: str
     path: str
+    timeframe: str
     start_date: datetime | None
     finish_date: datetime | None
 
@@ -26,6 +27,7 @@ class Milestone(BaseModel):
         result = Milestone(
             name=data["name"],
             path=data["path"],
+            timeframe=data["attributes"].get("timeFrame"),
             start_date=to_date(data["attributes"].get("startDate")),
             finish_date=to_date(
                 data["attributes"].get("finishDate"),
