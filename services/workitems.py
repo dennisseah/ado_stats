@@ -10,7 +10,13 @@ from utils.data_utils import divide_chunks
 data_cache = DataCache()
 
 
-def get_ids(settings: Azdo_Settings, kind: str) -> list[str]:
+def get_ids(kind: str) -> list[str]:
+    """Get all ids for a work item kind.
+
+    :param kind: The work item kind.
+    :return: A list of work item identifiers.
+    """
+    settings = Azdo_Settings.model_validate({})
     logging.info(f"[STARTED] Fetching {kind} ids")
 
     # api_params = "&".join([f"{k}={v}" for k, v in cfg_api.VERSION.items()])
@@ -43,9 +49,14 @@ def get_ids(settings: Azdo_Settings, kind: str) -> list[str]:
     raise ValueError(response.text)
 
 
-def fetch_work_items(
-    settings: Azdo_Settings, item_ids: list[str], creator: Callable
-) -> list[Any]:
+def fetch_work_items(item_ids: list[str], creator: Callable) -> list[Any]:
+    """Return a list of work items.
+
+    :param item_ids: The work item identifiers to fetch.
+    :param creator: The function to use to create the work item.
+    :return: A list of work items.
+    """
+    settings = Azdo_Settings.model_validate({})
     logging.info(f"[STARTED] Fetching work items {item_ids}")
 
     ids = ",".join(item_ids)
@@ -67,18 +78,24 @@ def fetch_work_items(
     raise ValueError(response.text)
 
 
-def get_all_items(settings: Azdo_Settings, kind: str, creator: Callable) -> list[Any]:
+def get_all_items(kind: str, creator: Callable) -> list[Any]:
+    """Return all work items of a given kind.
+
+    :param kind: The work item kind.
+    :param creator: The function to use to create the work item.
+    :return: A list of work items.
+    """
     logging.info(f"[STARTED] Fetching all {kind}")
-    items = data_cache.get(kind)
+    items = data_cache.get(kind)  # type: ignore
     if items:
         logging.info(f"Found {kind} in cache")
         return items
 
-    item_ids = get_ids(settings=settings, kind=kind)
+    item_ids = get_ids(kind=kind)
     items: list[Any] = []
 
     for chunk in divide_chunks(item_ids, 200):
-        items += fetch_work_items(settings=settings, item_ids=chunk, creator=creator)
+        items += fetch_work_items(item_ids=chunk, creator=creator)
 
     logging.info(f"Cache {kind}.")
     data_cache.push(key=kind, value=items)

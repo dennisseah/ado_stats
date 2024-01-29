@@ -1,12 +1,16 @@
 from statistics.base import aggr_accumulated, aggr_state, lifecycle
 
-from configurations.azdo_settings import Azdo_Settings
 from services.tasks import fetch as fetch_tasks
 from utils.display import as_table_group
 
 
-def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
-    tasks = fetch_tasks(settings)
+def generate(title: str, streamlit: bool = False):
+    """Generate statistics for tasks.
+
+    :param title: The title of the statistics.
+    :param streamlit: Whether to display the statistics in Streamlit.
+    """
+    tasks = fetch_tasks()
 
     tables = [
         aggr_state(title="By States", data=tasks),

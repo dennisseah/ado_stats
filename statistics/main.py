@@ -57,9 +57,9 @@ def main(with_st: bool = False):
         if with_st:
             tab = tabs[i]
             with tab:  # type: ignore
-                genr(settings=settings, title=titles[i], streamlit=True)
+                genr(title=titles[i], streamlit=True)
         else:
-            genr(settings=settings, title=titles[i])
+            genr(title=titles[i])
 
 
 if __name__ == "__main__":

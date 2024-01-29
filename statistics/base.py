@@ -8,6 +8,12 @@ from utils.display import Table
 
 
 def aggr_state(title: str, data: list[Any]) -> Table:
+    """Aggregates the states of the given data.
+
+    :param title: The title of the table.
+    :param data: The data to be aggregated.
+    :return: The aggregated data.
+    """
     import matplotlib.pyplot as plt
     import pandas as pd
     import streamlit as st
@@ -34,6 +40,12 @@ def aggr_state(title: str, data: list[Any]) -> Table:
 
 
 def aggr_accumulated(title: str, data: list[Any]) -> Table:
+    """Aggregates the accumulated data of the given data.
+
+    :param title: The title of the table.
+    :param data: The data to be aggregated.
+    :return: Display table object.
+    """
     aggr_created = aggr_count(data, "created_week", sort_values=False)
     aggr_closed = aggr_count(data, "closed_week", sort_values=False)
     aggr_removed = aggr_count(
@@ -92,6 +104,12 @@ def aggr_accumulated(title: str, data: list[Any]) -> Table:
 
 
 def lifecycle(title: str, data: list[Any]) -> Table:
+    """Returns lifecycle of the given data.
+
+    :param title: The title of the table.
+    :param data: The data to be aggregated.
+    :return: Display table object.
+    """
     created_by = aggr_count(data=data, dimension="created_by")
     assigned = aggr_count(data=data, dimension="assigned_to")
     closed_by = aggr_count(data=data, dimension="closed_by")

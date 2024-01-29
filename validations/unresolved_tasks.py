@@ -1,12 +1,11 @@
-from configurations.azdo_settings import Azdo_Settings
 from models.user_story import UserStory
 from services.tasks import fetch as fetch_tasks
 from services.workitems import fetch_work_items
 from utils.display import Table, as_table
 
 
-def validate(settings: Azdo_Settings):
-    tasks = fetch_tasks(settings)
+def validate():
+    tasks = fetch_tasks()
     active_tasks = [
         t
         for t in tasks
@@ -16,9 +15,7 @@ def validate(settings: Azdo_Settings):
         and t.state != "Removed"
     ]
     parent_ids = list(set([t.parent_id for t in active_tasks]))
-    user_stories = fetch_work_items(
-        settings=settings, item_ids=parent_ids, creator=UserStory.from_data
-    )
+    user_stories = fetch_work_items(item_ids=parent_ids, creator=UserStory.from_data)
     closed_stories = [
         (us.id, us.created_by)
         for us in user_stories
@@ -40,5 +37,5 @@ def validate(settings: Azdo_Settings):
     )
 
 
-settings = Azdo_Settings.model_validate({})
-validate(settings)
+if __name__ == "__main__":
+    validate()

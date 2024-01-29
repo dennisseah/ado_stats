@@ -23,6 +23,13 @@ class PullRequest(BaseModel):
     def from_data(
         cls, repo: str, data: dict[str, Any], discard_name_str: list[str]
     ) -> "PullRequest":
+        """Create a PullRequest object from a dict of data.
+
+        :param repo: name of the repo
+        :param data: dict of data
+        :param discard_name_str: list of strings to discard from the name
+        :return: PullRequest object
+        """
         created_by = format_name(
             name=data["createdBy"]["displayName"],
             discard_str=discard_name_str,

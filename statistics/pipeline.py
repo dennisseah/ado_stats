@@ -1,10 +1,14 @@
-from configurations.azdo_settings import Azdo_Settings
 from services.pipelines import fetch as fetch_pipelines
 from utils.display import Table, as_table_group
 
 
-def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
-    pipelines = fetch_pipelines(settings=settings)
+def generate(title: str, streamlit: bool = False):
+    """Generate statistics for pipelines.
+
+    :param title: The title of the statistics.
+    :param streamlit: Whether to display the statistics in Streamlit.
+    """
+    pipelines = fetch_pipelines()
 
     results = []
     for p in pipelines:

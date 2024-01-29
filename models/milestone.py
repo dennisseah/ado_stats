@@ -14,6 +14,11 @@ class Milestone(BaseModel):
 
     @classmethod
     def from_data(cls, data: dict[str, Any]) -> "Milestone":
+        """Create a Milestone object from a dict of data.
+
+        :param data: dict of data
+        :return: Milestone object
+        """
         return Milestone(
             name=data["name"],
             path=data["path"],

@@ -8,7 +8,12 @@ from utils.data_cache import DataCache
 data_cache = DataCache()
 
 
-def fetch(settings: Azdo_Settings) -> list[str]:
+def fetch() -> list[str]:
+    """Fetch git repositories from Azure DevOps
+
+    :return: A list of git repositories.
+    """
+    settings = Azdo_Settings.model_validate({})
     logging.info("[STARTED] Fetching git repositories")
 
     repos = data_cache.get("Git Repositories")

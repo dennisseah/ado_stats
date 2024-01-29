@@ -9,10 +9,14 @@ from utils.data_cache import DataCache
 data_cache = DataCache()
 
 
-def fetch(
-    settings: Azdo_Settings,
-    repo: str,
-) -> list[GitBranch]:
+def fetch(repo: str) -> list[GitBranch]:
+    """Return a list of all branches for a repo.
+
+    :param repo: The name of the repo to fetch branches for.
+    :return: A list of GitBranch objects.
+    """
+    settings = Azdo_Settings.model_validate({})
+
     logging.info(f"[STARTED] Fetching branches for {repo}")
 
     branches = data_cache.get(f"Git Branches {repo}")

@@ -8,6 +8,8 @@ from tabulate import tabulate
 
 
 class Table(BaseModel):
+    """Display table."""
+
     title: str
     headers: list[str]
     data: list[tuple]

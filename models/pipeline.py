@@ -17,6 +17,11 @@ class PipelineRun(BaseModel):
 
     @classmethod
     def from_data(cls, data: dict[str, Any]) -> "PipelineRun":
+        """Create a PipelineRun object from a dict of data.
+
+        :param data: dict of data
+        :return: PipelineRun object
+        """
         created_date = to_date(date_str=data.get("createdDate"))
         finished_date = to_date(date_str=data.get("finishedDate"))
 
@@ -44,6 +49,11 @@ class Pipeline(BaseModel):
 
     @classmethod
     def from_data(cls, data: dict[str, Any]) -> "Pipeline":
+        """Create a Pipeline object from a dict of data.
+
+        :param data: dict of data
+        :return: Pipeline object
+        """
         return Pipeline(
             id=str(data["id"]),
             name=data["name"],

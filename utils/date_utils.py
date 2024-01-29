@@ -2,6 +2,11 @@ from datetime import datetime
 
 
 def to_date(date_str: str | None) -> datetime | None:
+    """Converts the given date string to datetime.
+
+    :param date_str: The date string.
+    :return: The datetime.
+    """
     if not date_str:
         return None
 
@@ -10,6 +15,11 @@ def to_date(date_str: str | None) -> datetime | None:
 
 
 def to_week(d: datetime | None) -> str | None:
+    """Converts the given datetime to week.
+
+    :param d: The datetime.
+    :return: The week.
+    """
     if not d:
         return None
 

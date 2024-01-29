@@ -1,12 +1,16 @@
 from statistics.base import aggr_accumulated, aggr_state, lifecycle
 
-from configurations.azdo_settings import Azdo_Settings
 from services.bugs import fetch as fetch_bugs
 from utils.display import as_table_group
 
 
-def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
-    bugs = fetch_bugs(settings)
+def generate(title: str, streamlit: bool = False):
+    """Generate statistics for bugs.
+
+    :param title: The title of the statistics.
+    :param streamlit: Whether to display the statistics in Streamlit.
+    """
+    bugs = fetch_bugs()
 
     tables = [
         aggr_state(title="By States", data=bugs),

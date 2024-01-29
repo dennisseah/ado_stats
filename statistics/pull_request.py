@@ -2,7 +2,6 @@ from collections import defaultdict
 
 from pydantic import BaseModel
 
-from configurations.azdo_settings import Azdo_Settings
 from models.pull_request import PullRequest
 from services.git_repositories import fetch as fetch_repositories
 from services.pull_requests import fetch as fetch_pull_requests
@@ -18,6 +17,11 @@ class CountItem(BaseModel):
 
 
 def aggr(results: list[PullRequest]) -> list[tuple[str, int, int, int, int, int]]:
+    """Aggregate pull requests by engineer.
+
+    :param results: The list of pull requests.
+    :return: The aggregated pull requests.
+    """
     engineers = set([result.created_by for result in results])
     counts: dict[str, CountItem] = {}
 
@@ -58,6 +62,12 @@ def aggr(results: list[PullRequest]) -> list[tuple[str, int, int, int, int, int]
 def time_to_merge(
     repo: str, results: list[PullRequest]
 ) -> tuple[str, int, int, int, int]:
+    """Calculate the time to merge.
+
+    :param repo: The repository name.
+    :param results: The list of pull requests.
+    :return: The time to merge.
+    """
     data = [r.merge_days for r in results if r.merge_days is not None]
 
     return (
@@ -74,6 +84,12 @@ def time_to_merge(
 
 
 def by_week(title: str, results: list[PullRequest]) -> Table:
+    """Returns pull requests by week.
+
+    :param title: The title of the table.
+    :param results: The list of pull requests.
+    :return: Display table object.
+    """
     weeks = set([r.created_week for r in results])
     for result in results:
         if result.closed_week:
@@ -100,6 +116,12 @@ def by_week(title: str, results: list[PullRequest]) -> Table:
 
 
 def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]) -> Table:
+    """Returns pull requests table.
+
+    :param title: The title of the table.
+    :param data: The data to be aggregated.
+    :return: Display table object.
+    """
     return Table(
         title=title,
         headers=["engineer", "created", "active", "completed", "abandoned", "reviewed"],
@@ -107,15 +129,20 @@ def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]) -> Table:
     )
 
 
-def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
-    repos = fetch_repositories(settings)
+def generate(title: str, streamlit: bool = False):
+    """Generate statistics for pull requests.
+
+    :param title: The title of the statistics.
+    :param streamlit: Whether to display the statistics in Streamlit.
+    """
+    repos = fetch_repositories()
     total = []
     merge_times = []
 
     tables = []
 
     for repo in repos:
-        prs = fetch_pull_requests(settings, repo)
+        prs = fetch_pull_requests(repo)
         tables.append(tbl(title=repo, data=aggr(prs)))
         tables.append(by_week(title=repo, results=prs))
         merge_times.append(time_to_merge(repo, prs))

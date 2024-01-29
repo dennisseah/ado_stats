@@ -6,7 +6,12 @@ from configurations.azdo_settings import Azdo_Settings
 from models.pipeline import Pipeline, PipelineRun
 
 
-def fetch_ids(settings: Azdo_Settings) -> list[Pipeline]:
+def fetch_ids() -> list[Pipeline]:
+    """Fetch pipeline identifiers from Azure DevOps
+
+    :return: A list of pipeline identifiers.
+    """
+    settings = Azdo_Settings.model_validate({})
     logging.info("[STARTED] Fetching pipeline ids")
 
     url = f"{settings.get_rest_base_uri()}/pipelines"
@@ -25,7 +30,13 @@ def fetch_ids(settings: Azdo_Settings) -> list[Pipeline]:
     raise ValueError("Cannot fetch pipeline identifiers")
 
 
-def fetch_runs(settings: Azdo_Settings, pipeline_id: str) -> list[PipelineRun]:
+def fetch_runs(pipeline_id: str) -> list[PipelineRun]:
+    """Fetch pipeline runs from Azure DevOps
+
+    :param pipeline_id: The pipeline identifier to fetch runs for.
+    :return: A list of pipeline runs.
+    """
+    settings = Azdo_Settings.model_validate({})
     logging.info(f"[STARTED] Fetching pipeline runs for {pipeline_id}")
 
     url = f"{settings.get_rest_base_uri()}/pipelines/{pipeline_id}/runs"
@@ -44,10 +55,14 @@ def fetch_runs(settings: Azdo_Settings, pipeline_id: str) -> list[PipelineRun]:
     raise ValueError("Cannot fetch pipeline runs")
 
 
-def fetch(settings: Azdo_Settings) -> list[Pipeline]:
-    pipelines = fetch_ids(settings=settings)
+def fetch() -> list[Pipeline]:
+    """Fetch pipeline runs from Azure DevOps
+
+    :return: A list of pipelines with runs.
+    """
+    pipelines = fetch_ids()
 
     for p in pipelines:
-        p.runs = fetch_runs(settings=settings, pipeline_id=p.id)
+        p.runs = fetch_runs(pipeline_id=p.id)
 
     return [p for p in pipelines if p.runs]

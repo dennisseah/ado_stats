@@ -5,12 +5,15 @@ import pandas as pd
 import streamlit as st
 
 import utils.aggr_utils as aggr_utils
-from configurations.azdo_settings import Azdo_Settings
 from services.user_stories import fetch as fetch_stories
 from utils.display import Table, as_table_group
 
 
 def pie_chart(df: pd.DataFrame):
+    """Display a pie chart.
+
+    :param df: The data frame.
+    """
     data = df.to_dict("list")
     fig = plt.figure(figsize=(4, 3))
     plt.pie(
@@ -22,8 +25,13 @@ def pie_chart(df: pd.DataFrame):
     st.pyplot(fig.figure, use_container_width=False)
 
 
-def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
-    user_stories = fetch_stories(settings)
+def generate(title: str, streamlit: bool = False):
+    """Generate statistics for user stories.
+
+    :param title: The title of the statistics.
+    :param streamlit: Whether to display the statistics in Streamlit.
+    """
+    user_stories = fetch_stories()
 
     orphan_stories = [
         (us.id, us.title) for us in filter(lambda us: not us.parent_id, user_stories)

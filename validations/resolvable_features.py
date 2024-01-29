@@ -1,4 +1,3 @@
-from configurations.azdo_settings import Azdo_Settings
 from models.user_story import UserStory
 from services.features import fetch as fetch_features
 from services.workitems import fetch_work_items
@@ -6,10 +5,10 @@ from utils.data_utils import divide_chunks
 from utils.display import Table, as_table
 
 
-def validate(settings: Azdo_Settings):
+def validate():
     features = [
         f
-        for f in fetch_features(settings)
+        for f in fetch_features()
         if f.state != "Closed" and f.state != "Removed" and f.state != "Resolved"
     ]
 
@@ -19,9 +18,7 @@ def validate(settings: Azdo_Settings):
 
     user_stories = []
     for chunk in divide_chunks(child_ids, 200):
-        user_stories += fetch_work_items(
-            settings=settings, item_ids=chunk, creator=UserStory.from_data
-        )
+        user_stories += fetch_work_items(item_ids=chunk, creator=UserStory.from_data)
 
     closed_user_stories = set(
         [us.id for us in user_stories if us.state == "Closed" or us.state == "Resolved"]
@@ -43,5 +40,4 @@ def validate(settings: Azdo_Settings):
     )
 
 
-settings = Azdo_Settings.model_validate({})
-validate(settings)
+validate()

@@ -1,10 +1,9 @@
-from configurations.azdo_settings import Azdo_Settings
 from services.tasks import fetch as fetch_tasks
 from utils.display import Table, as_table
 
 
-def validate(settings: Azdo_Settings):
-    tasks = fetch_tasks(settings)
+def validate():
+    tasks = fetch_tasks()
     orphaned_tasks = [
         t
         for t in tasks
@@ -22,5 +21,5 @@ def validate(settings: Azdo_Settings):
     )
 
 
-settings = Azdo_Settings.model_validate({})
-validate(settings)
+if __name__ == "__main__":
+    validate()

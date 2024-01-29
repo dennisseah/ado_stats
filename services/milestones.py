@@ -9,10 +9,13 @@ from utils.data_cache import DataCache
 data_cache = DataCache()
 
 
-def fetch(
-    settings: Azdo_Settings,
-) -> list[Milestone]:
+def fetch() -> list[Milestone]:
+    """Fetch milestones from Azure DevOps
+
+    :return: A list of milestones.
+    """
     logging.info("[STARTED] Fetching milestone")
+    settings = Azdo_Settings.model_validate({})
 
     milestones = data_cache.get("milestone")
     if milestones:

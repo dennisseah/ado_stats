@@ -10,11 +10,18 @@ data_cache = DataCache()
 
 
 def fetch_pull_requests(
-    settings: Azdo_Settings,
     repo: str,
     active_only: bool = False,
     skip: int = 0,
 ):
+    """Fetch pull requests for a repo.
+
+    :param repo: The repo name.
+    :param active_only: If True, only active pull requests will be returned.
+    :param skip: The number of pull requests to skip.
+    :return: A list of PullRequest objects.
+    """
+    settings = Azdo_Settings.model_validate({})
     logging.info(f"[STARTED] Fetching pull requests for {repo}")
 
     url = f"{settings.get_rest_base_uri()}/git/repositories/{repo}/pullrequests"
@@ -42,7 +49,13 @@ def fetch_pull_requests(
     raise ValueError("Cannot fetch data")
 
 
-def fetch(settings: Azdo_Settings, repo: str, active_only: bool = False):
+def fetch(repo: str, active_only: bool = False) -> list[PullRequest]:
+    """Fetch pull requests for a repo.
+
+    :param repo: The repo name.
+    :param active_only: If True, only active pull requests will be returned.
+    :return: A list of PullRequest objects.
+    """
     logging.info(f"[STARTED] Fetching pull requests for {repo}")
 
     prs = data_cache.get(f"Pull Request {repo}")
@@ -51,13 +64,11 @@ def fetch(settings: Azdo_Settings, repo: str, active_only: bool = False):
         return prs
 
     prs = []
-    results = fetch_pull_requests(settings=settings, repo=repo, active_only=active_only)
+    results = fetch_pull_requests(repo=repo, active_only=active_only)
 
     while results:
         prs += results
-        results = fetch_pull_requests(
-            settings=settings, repo=repo, active_only=active_only, skip=len(prs)
-        )
+        results = fetch_pull_requests(repo=repo, active_only=active_only, skip=len(prs))
 
     logging.info(f"Cache pull requests for {repo}.")
     data_cache.push(key=f"Pull Request {repo}", value=prs)

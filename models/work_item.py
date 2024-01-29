@@ -31,6 +31,12 @@ class WorkItem(BaseModel):
 
     @classmethod
     def from_data(cls, data: dict[str, Any], discard_name_str: list[str]) -> "WorkItem":
+        """Create a WorkItem object from a dict of data.
+
+        :param data: dict of data
+        :param discard_name_str: list of strings to discard from the name
+        :return: WorkItem object
+        """
         fields = data["fields"]
         area_paths = fields["System.AreaPath"].split("\\")
         area_path = area_paths[1] if len(area_paths) > 1 else ""
