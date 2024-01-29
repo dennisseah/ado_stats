@@ -14,7 +14,9 @@ def validate():
         and t.state != "Resolved"
         and t.state != "Removed"
     ]
-    parent_ids = list(set([t.parent_id for t in active_tasks]))
+    parent_ids = list(
+        set([t.parent_id for t in active_tasks if t.parent_id is not None])
+    )
     user_stories = fetch_work_items(item_ids=parent_ids, creator=UserStory.from_data)
     closed_stories = [
         (us.id, us.created_by)
