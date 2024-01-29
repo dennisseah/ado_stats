@@ -11,6 +11,7 @@ class Table(BaseModel):
     title: str
     headers: list[str]
     data: list[tuple]
+    tbl_note: str | None = None
     streamlit_chart: Callable | None = None
 
     def to_dict(self):
@@ -35,35 +36,30 @@ def as_table_group(
     tabs: bool = False,
     streamlit: bool = False,
 ):
+    def streamlit_tbl(tbl: Table):
+        st.markdown(f"**{tbl.title}**")
+        if tbl.streamlit_chart:
+            tbl.streamlit_chart(tbl.to_dataframe())  # type: ignore
+
+        if tbl.tbl_note:
+            st.markdown(tbl.tbl_note)
+        st.dataframe(
+            data=tbl.to_dataframe(),
+            hide_index=True,
+            width=600,
+            height=min(800, 50 * len(tbl.data)),
+        )
+
     if streamlit:
         if tabs:
             tab_objs = st.tabs([tbl.title for tbl in tables])
 
             for i, tab in enumerate(tab_objs):
                 with tab:
-                    tbl = tables[i]
-                    st.subheader(tbl.title)
-                    if tbl.streamlit_chart:
-                        tbl.streamlit_chart(tbl.to_dataframe())  # type: ignore
-
-                    st.dataframe(
-                        data=tbl.to_dataframe(),
-                        hide_index=True,
-                        width=600,
-                        height=min(800, 50 * len(tbl.data)),
-                    )
+                    streamlit_tbl(tables[i])
         else:
             for tbl in tables:
-                st.subheader(tbl.title)
-                if tbl.streamlit_chart:
-                    tbl.streamlit_chart(tbl.to_dataframe())
-
-                st.dataframe(
-                    data=tbl.to_dataframe(),
-                    hide_index=True,
-                    width=600,
-                    height=min(800, 50 * len(tbl.data)),
-                )
+                streamlit_tbl(tbl)
 
     else:
         print()
@@ -73,19 +69,20 @@ def as_table_group(
         for tbl in tables:
             print()
             print(tbl.title)
+            if tbl.tbl_note:
+                print(tbl.tbl_note)
             print(tabulate(tbl.data, headers=tbl.headers, tablefmt=tablefmt))
 
 
 def plot_bar_chart(
     df: pd.DataFrame,
     x_column: str,
-    id_vars: list[str],
     value_vars: list[str],
 ):
-    src = df.melt(id_vars=id_vars, value_vars=value_vars)
+    src = df.melt(id_vars=[x_column], value_vars=value_vars)
 
     chart = (
-        alt.Chart(src, height=400, width=80)
+        alt.Chart(src)
         .mark_bar(strokeWidth=100)
         .encode(
             x=alt.X(
@@ -95,17 +92,12 @@ def plot_bar_chart(
             color=alt.Color(
                 "variable:N",
                 legend=alt.Legend(
-                    orient="none",
-                    legendX=130,
-                    legendY=-80,
-                    direction="horizontal",
-                    titleAnchor="middle",
+                    orient="top",
                 ),
             ),
             column=alt.Column(f"{x_column}:N", title="", spacing=0),
         )
         .configure_header(labelOrient="bottom")  # type: ignore
-        .configure_view(strokeOpacity=0)
     )
 
     st.altair_chart(chart, use_container_width=False)

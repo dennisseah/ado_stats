@@ -17,6 +17,8 @@ class UserStoriesStatus(BaseModel):
 
 def count_user_stories_states(features: list[Any], settings: Azdo_Settings):
     feature_titles = {f.id: f.title for f in features}
+    feature_states = {f.id: f.state for f in features}
+
     user_stories = fetch_user_stories(settings)
     existing_features = {f.id for f in features}
     feature_ids = {f: UserStoriesStatus() for f in existing_features}
@@ -33,13 +35,21 @@ def count_user_stories_states(features: list[Any], settings: Azdo_Settings):
                     status.closed += 1
 
     data = [
-        (f, feature_titles.get(f), status.new, status.active, status.closed)
+        (
+            f,
+            feature_titles.get(f),
+            feature_states.get(f),
+            status.new,
+            status.active,
+            status.closed,
+        )
         for f, status in feature_ids.items()
     ]
     data.sort(key=lambda x: x[0])
     return Table(
         title="User Stories States",
-        headers=["Feature", "Title", "New", "Active", "Closed"],
+        tbl_note="*New, Active, Closed are its user stories' states.*",
+        headers=["Id", "Feature Title", "State", "New", "Active", "Closed"],
         data=data,
     )
 

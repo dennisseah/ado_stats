@@ -897,7 +897,7 @@ urllib3==2.1.0 ; python_version >= "3.10" and python_version < "4.0" \
 validators==0.22.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:61cf7d4a62bbae559f2e54aed3b000cea9ff3e2fdbe463f51179b92c58c9585a \
     --hash=sha256:77b2689b172eeeb600d9605ab86194641670cdb73b60afd577142a9397873370
-watchdog==3.0.0 ; python_version >= "3.10" and python_version < "4.0" and platform_system != "Darwin" \
+watchdog==3.0.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:0e06ab8858a76e1219e68c7573dfeba9dd1c0219476c5a44d5333b01d7e1743a \
     --hash=sha256:13bbbb462ee42ec3c5723e1205be8ced776f05b100e4737518c67c8325cf6100 \
     --hash=sha256:233b5817932685d39a7896b1090353fc8efc1ef99c9c054e46c8002561252fb8 \

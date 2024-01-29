@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-import pandas as pd
 from pydantic import BaseModel
 
 from configurations.azdo_settings import Azdo_Settings
@@ -74,12 +73,6 @@ def time_to_merge(
     )
 
 
-def streamlit_chart(df: pd.DataFrame):
-    plot_bar_chart(
-        df=df, x_column="week", id_vars=["week"], value_vars=["created", "closed"]
-    )
-
-
 def by_week(title: str, results: list[PullRequest]) -> Table:
     weeks = set([r.created_week for r in results])
     for result in results:
@@ -100,7 +93,9 @@ def by_week(title: str, results: list[PullRequest]) -> Table:
         title=title,
         headers=["week", "created", "closed"],
         data=data,
-        streamlit_chart=streamlit_chart,
+        streamlit_chart=lambda df: plot_bar_chart(
+            df=df, x_column="week", value_vars=["created", "closed"]
+        ),
     )
 
 

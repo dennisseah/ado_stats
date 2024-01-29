@@ -1,13 +1,15 @@
 from collections import defaultdict
+from datetime import datetime
 
 import pandas as pd
+import streamlit as st
 
 from configurations.azdo_settings import Azdo_Settings
 from models.milestone import Milestone
 from models.user_story import UserStory
 from services.milestones import fetch as fetch_milestones
 from services.user_stories import fetch as fetch_stories
-from utils.display import Table, as_table_group, plot_bar_chart
+from utils.display import Table, as_table_group
 
 
 def get_milestones(settings: Azdo_Settings) -> dict[str, Milestone]:
@@ -16,6 +18,9 @@ def get_milestones(settings: Azdo_Settings) -> dict[str, Milestone]:
 
 
 def aggr_milestones(data: list[UserStory], milestones: dict[str, Milestone]):
+    def fmt_date(d: datetime | None) -> str:
+        return d.strftime("%Y-%m-%d") if d else ""
+
     points = {
         "open": defaultdict(int),
         "closed": defaultdict(int),
@@ -31,37 +36,23 @@ def aggr_milestones(data: list[UserStory], milestones: dict[str, Milestone]):
                 story.story_points if story.story_points > 0 else 5
             )
 
-    results = []
-    for ms, milestone in milestones.items():
-        results.append(
-            (
-                milestone.name,
-                (
-                    milestone.start_date.strftime("%Y-%m-%d")
-                    if milestone.start_date
-                    else ""
-                ),
-                (
-                    milestone.finish_date.strftime("%Y-%m-%d")
-                    if milestone.finish_date
-                    else ""
-                ),
-                points["open"].get(ms, 0),
-                points["closed"].get(ms, 0),
-            )
+    def fmt_point(id: str, milestone: Milestone) -> tuple[str, str, str, int, int]:
+        return (
+            milestone.name,
+            fmt_date(milestone.start_date),
+            fmt_date(milestone.finish_date),
+            points["open"].get(id, 0),
+            points["closed"].get(id, 0),
         )
 
+    results = [fmt_point(id, milestone) for id, milestone in milestones.items()]
     results.sort(key=lambda x: (x[1], x[0]))
     return results
 
 
 def plot_chart(df: pd.DataFrame):
-    plot_bar_chart(
-        df=df,
-        x_column="milestone",
-        id_vars=["milestone"],
-        value_vars=["active", "resolved"],
-    )
+    st.markdown("Burndown chart")
+    st.area_chart(df, x="milestone", y=["active", "resolved"])
 
 
 def generate(settings: Azdo_Settings, title: str, streamlit: bool = False):
