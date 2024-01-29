@@ -16,8 +16,9 @@ def get_ids(kind: str) -> list[str]:
     :param kind: The work item kind.
     :return: A list of work item identifiers.
     """
+    logger = logging.getLogger(__name__)
     settings = Azdo_Settings.model_validate({})
-    logging.info(f"[STARTED] Fetching {kind} ids")
+    logger.debug(f"[BEGIN] Fetching {kind} ids")
 
     # api_params = "&".join([f"{k}={v}" for k, v in cfg_api.VERSION.items()])
     url = f"{settings.get_rest_base_uri()}/wit/wiql?$top=5000"
@@ -42,10 +43,10 @@ def get_ids(kind: str) -> list[str]:
     if response.status_code == 200:
         work_items = response.json()["workItems"]
 
-        logging.info(f"[COMPLETED] Fetching {kind} ids")
+        logger.debug(f"[END] Fetching {kind} ids")
         return [str(work_item["id"]) for work_item in work_items]
 
-    logging.error(f"Error fetching {kind} ids: {response.text}")
+    logger.error(f"Error fetching {kind} ids: {response.text}")
     raise ValueError(response.text)
 
 
@@ -57,7 +58,8 @@ def fetch_work_items(item_ids: list[str], creator: Callable) -> list[Any]:
     :return: A list of work items.
     """
     settings = Azdo_Settings.model_validate({})
-    logging.info(f"[STARTED] Fetching work items {item_ids}")
+    logger = logging.getLogger(__name__)
+    logger.debug(f"[BEGIN] Fetching work items {item_ids}")
 
     ids = ",".join(item_ids)
     url = f"{settings.get_rest_base_uri()}/wit/workitems?ids={ids}&$expand=Relations"  # noqa E501
@@ -68,13 +70,13 @@ def fetch_work_items(item_ids: list[str], creator: Callable) -> list[Any]:
     )
 
     if response.status_code == 200:
-        logging.info(f"[COMPLETED] Fetching work items {item_ids}")
+        logger.debug(f"[END] Fetching work items {item_ids}")
         return [
             creator(val, settings.get_name_discard_str())
             for val in response.json()["value"]
         ]
 
-    logging.error(f"Error fetching work items {item_ids}: {response.text}")
+    logger.error(f"Error fetching work items {item_ids}: {response.text}")
     raise ValueError(response.text)
 
 
@@ -85,10 +87,11 @@ def get_all_items(kind: str, creator: Callable) -> list[Any]:
     :param creator: The function to use to create the work item.
     :return: A list of work items.
     """
-    logging.info(f"[STARTED] Fetching all {kind}")
+    logger = logging.getLogger(__name__)
+    logger.debug(f"[BEGIN] Fetching all {kind}")
     items = data_cache.get(kind)  # type: ignore
     if items:
-        logging.info(f"Found {kind} in cache")
+        logger.debug(f"Found {kind} in cache")
         return items
 
     item_ids = get_ids(kind=kind)
@@ -97,8 +100,8 @@ def get_all_items(kind: str, creator: Callable) -> list[Any]:
     for chunk in divide_chunks(item_ids, 200):
         items += fetch_work_items(item_ids=chunk, creator=creator)
 
-    logging.info(f"Cache {kind}.")
+    logger.debug(f"Cache {kind}.")
     data_cache.push(key=kind, value=items)
 
-    logging.info(f"[COMPLETED] Fetching all {kind}")
+    logger.debug(f"[END] Fetching all {kind}")
     return items

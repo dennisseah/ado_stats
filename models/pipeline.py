@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -22,6 +23,9 @@ class PipelineRun(BaseModel):
         :param data: dict of data
         :return: PipelineRun object
         """
+        logger = logging.getLogger(__name__)
+        logger.debug("[BEGIN] Creating PipelineRun from data")
+
         created_date = to_date(date_str=data.get("createdDate"))
         finished_date = to_date(date_str=data.get("finishedDate"))
 
@@ -31,7 +35,7 @@ class PipelineRun(BaseModel):
             else None
         )
 
-        return PipelineRun(
+        result = PipelineRun(
             id=str(data["id"]),
             name=data["name"],
             state=data["state"],
@@ -40,6 +44,9 @@ class PipelineRun(BaseModel):
             finished_date=finished_date,
             run_duration=run_duration,
         )
+
+        logger.debug("[END] Creating PipelineRun from data")
+        return result
 
 
 class Pipeline(BaseModel):
@@ -54,7 +61,13 @@ class Pipeline(BaseModel):
         :param data: dict of data
         :return: Pipeline object
         """
-        return Pipeline(
+        logger = logging.getLogger(__name__)
+        logger.debug("[BEGIN] Creating Pipeline from data")
+
+        result = Pipeline(
             id=str(data["id"]),
             name=data["name"],
         )
+
+        logger.debug("[END] Creating Pipeline from data")
+        return result

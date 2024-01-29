@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -19,7 +20,10 @@ class Milestone(BaseModel):
         :param data: dict of data
         :return: Milestone object
         """
-        return Milestone(
+        logger = logging.getLogger(__name__)
+        logger.debug("[BEGIN] Creating Milestone from data")
+
+        result = Milestone(
             name=data["name"],
             path=data["path"],
             start_date=to_date(data["attributes"].get("startDate")),
@@ -27,3 +31,6 @@ class Milestone(BaseModel):
                 data["attributes"].get("finishDate"),
             ),
         )
+
+        logger.debug("[END] Creating Milestone from data")
+        return result

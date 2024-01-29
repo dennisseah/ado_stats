@@ -14,11 +14,12 @@ def fetch() -> list[str]:
     :return: A list of git repositories.
     """
     settings = Azdo_Settings.model_validate({})
-    logging.info("[STARTED] Fetching git repositories")
+    logger = logging.getLogger(__name__)
+    logger.debug("[BEGIN] Fetching git repositories")
 
     repos = data_cache.get("Git Repositories")
     if repos:
-        logging.info("Found git repositories in cache")
+        logger.debug("Found git repositories in cache")
         return repos
 
     url = f"{settings.get_rest_base_uri()}/git/repositories"
@@ -31,11 +32,11 @@ def fetch() -> list[str]:
         if ignores:
             repos = [repo for repo in repos if repo not in ignores]
 
-        logging.info("Cache git repositories.")
+        logger.debug("Cache git repositories.")
         data_cache.push(key="Git Repositories", value=repos)
 
-        logging.info("[COMPLETED] Fetching git repositories")
+        logger.debug("[END] Fetching git repositories")
         return repos
 
-    logging.error(f"Error fetching git repositories: {response.text}")
+    logger.error(f"Error fetching git repositories: {response.text}")
     raise ValueError("Cannot fetch git repositories")

@@ -14,12 +14,13 @@ def fetch() -> list[Milestone]:
 
     :return: A list of milestones.
     """
-    logging.info("[STARTED] Fetching milestone")
+    logger = logging.getLogger(__name__)
+    logger.debug("[BEGIN] Fetching milestone")
     settings = Azdo_Settings.model_validate({})
 
     milestones = data_cache.get("milestone")
     if milestones:
-        logging.info("Found milestones in cache")
+        logger.debug("Found milestones in cache")
         return milestones
 
     url = f"{settings.get_rest_base_uri()}/work/teamsettings/iterations"
@@ -30,7 +31,9 @@ def fetch() -> list[Milestone]:
     )
 
     if response.status_code == 200:
-        return [Milestone.from_data(r) for r in response.json()["value"]]
+        results = [Milestone.from_data(r) for r in response.json()["value"]]
+        logger.debug("[END] Fetching milestones")
+        return results
 
-    logging.error(f"Error fetching milestones: {response.text}")
+    logger.error(f"Error fetching milestones: {response.text}")
     raise ValueError("Cannot fetch data")

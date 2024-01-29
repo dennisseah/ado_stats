@@ -22,7 +22,8 @@ def fetch_pull_requests(
     :return: A list of PullRequest objects.
     """
     settings = Azdo_Settings.model_validate({})
-    logging.info(f"[STARTED] Fetching pull requests for {repo}")
+    logger = logging.getLogger(__name__)
+    logger.debug(f"[BEGIN] Fetching pull requests for {repo}")
 
     url = f"{settings.get_rest_base_uri()}/git/repositories/{repo}/pullrequests"
     params: dict[str, str | int] = {"$skip": skip}
@@ -37,7 +38,7 @@ def fetch_pull_requests(
     )
 
     if response.status_code == 200:
-        logging.info(f"[COMPLETED] Fetching pull requests for {repo}")
+        logger.debug(f"[END] Fetching pull requests for {repo}")
         return [
             PullRequest.from_data(
                 repo=repo, data=pr, discard_name_str=settings.get_name_discard_str()
@@ -45,7 +46,7 @@ def fetch_pull_requests(
             for pr in response.json()["value"]
         ]
 
-    logging.error(f"Error fetching pull requests for {repo}: {response.text}")
+    logger.error(f"Error fetching pull requests for {repo}: {response.text}")
     raise ValueError("Cannot fetch data")
 
 
@@ -56,11 +57,12 @@ def fetch(repo: str, active_only: bool = False) -> list[PullRequest]:
     :param active_only: If True, only active pull requests will be returned.
     :return: A list of PullRequest objects.
     """
-    logging.info(f"[STARTED] Fetching pull requests for {repo}")
+    logger = logging.getLogger(__name__)
+    logger.debug(f"[BEGIN] Fetching pull requests for {repo}")
 
     prs = data_cache.get(f"Pull Request {repo}")
     if prs:
-        logging.info(f"Found pull requests for {repo} in cache")
+        logger.debug(f"Found pull requests for {repo} in cache")
         return prs
 
     prs = []
@@ -70,8 +72,8 @@ def fetch(repo: str, active_only: bool = False) -> list[PullRequest]:
         prs += results
         results = fetch_pull_requests(repo=repo, active_only=active_only, skip=len(prs))
 
-    logging.info(f"Cache pull requests for {repo}.")
+    logger.debug(f"Cache pull requests for {repo}.")
     data_cache.push(key=f"Pull Request {repo}", value=prs)
 
-    logging.info(f"[COMPLETED] Fetching pull requests for {repo}")
+    logger.debug(f"[END] Fetching pull requests for {repo}")
     return prs

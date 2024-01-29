@@ -11,8 +11,9 @@ def fetch_ids() -> list[Pipeline]:
 
     :return: A list of pipeline identifiers.
     """
+    logger = logging.getLogger(__name__)
     settings = Azdo_Settings.model_validate({})
-    logging.info("[STARTED] Fetching pipeline ids")
+    logger.debug("[BEGIN] Fetching pipeline ids")
 
     url = f"{settings.get_rest_base_uri()}/pipelines"
 
@@ -23,10 +24,10 @@ def fetch_ids() -> list[Pipeline]:
     )
 
     if response.status_code == 200:
-        logging.info("[COMPLETED] Fetching pipeline ids")
+        logger.debug("[END] Fetching pipeline ids")
         return [Pipeline.from_data(p) for p in response.json()["value"]]
 
-    logging.error(f"Error fetching pipeline ids: {response.text}")
+    logger.error(f"Error fetching pipeline ids: {response.text}")
     raise ValueError("Cannot fetch pipeline identifiers")
 
 
@@ -37,7 +38,8 @@ def fetch_runs(pipeline_id: str) -> list[PipelineRun]:
     :return: A list of pipeline runs.
     """
     settings = Azdo_Settings.model_validate({})
-    logging.info(f"[STARTED] Fetching pipeline runs for {pipeline_id}")
+    logger = logging.getLogger(__name__)
+    logger.debug(f"[BEGIN] Fetching pipeline runs for {pipeline_id}")
 
     url = f"{settings.get_rest_base_uri()}/pipelines/{pipeline_id}/runs"
 
@@ -48,10 +50,10 @@ def fetch_runs(pipeline_id: str) -> list[PipelineRun]:
     )
 
     if response.status_code == 200:
-        logging.info(f"[COMPLETED] Fetching pipeline runs for {pipeline_id}")
+        logger.debug(f"[END] Fetching pipeline runs for {pipeline_id}")
         return [PipelineRun.from_data(x) for x in response.json()["value"]]
 
-    logging.error(f"Error fetching pipeline runs for {pipeline_id}: {response.text}")
+    logger.error(f"Error fetching pipeline runs for {pipeline_id}: {response.text}")
     raise ValueError("Cannot fetch pipeline runs")
 
 
@@ -60,9 +62,14 @@ def fetch() -> list[Pipeline]:
 
     :return: A list of pipelines with runs.
     """
+    logger = logging.getLogger(__name__)
+    logger.debug("[BEGIN] Fetching pipelines")
     pipelines = fetch_ids()
 
     for p in pipelines:
         p.runs = fetch_runs(pipeline_id=p.id)
 
-    return [p for p in pipelines if p.runs]
+    results = [p for p in pipelines if p.runs]
+
+    logger.debug("[END] Fetching pipelines")
+    return results

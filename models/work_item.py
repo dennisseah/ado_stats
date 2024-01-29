@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -37,6 +38,9 @@ class WorkItem(BaseModel):
         :param discard_name_str: list of strings to discard from the name
         :return: WorkItem object
         """
+        logger = logging.getLogger(__name__)
+        logger.debug("[BEGIN] Creating WorkItem from data")
+
         fields = data["fields"]
         area_paths = fields["System.AreaPath"].split("\\")
         area_path = area_paths[1] if len(area_paths) > 1 else ""
@@ -75,7 +79,7 @@ class WorkItem(BaseModel):
                 else None
             )
 
-        return WorkItem(
+        result = WorkItem(
             id=str(data["id"]),
             title=fields["System.Title"],
             description=fields.get("System.Description", ""),
@@ -100,3 +104,6 @@ class WorkItem(BaseModel):
             parent_id=parent_id,
             child_ids=child_ids,
         )
+
+        logger.debug("[END] Creating WorkItem from data")
+        return result

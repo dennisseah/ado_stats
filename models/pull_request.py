@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 from typing import Any
 
@@ -30,6 +31,9 @@ class PullRequest(BaseModel):
         :param discard_name_str: list of strings to discard from the name
         :return: PullRequest object
         """
+        logger = logging.getLogger(__name__)
+        logger.debug("[BEGIN] Creating PullRequest from data")
+
         created_by = format_name(
             name=data["createdBy"]["displayName"],
             discard_str=discard_name_str,
@@ -48,7 +52,8 @@ class PullRequest(BaseModel):
             for r in data.get("reviewers", [])
             if r.get("vote", 0) > 0
         ]
-        return PullRequest(
+
+        result = PullRequest(
             repo=repo,
             status=data["status"],
             is_draft=data.get("isDraft", False),
@@ -60,3 +65,6 @@ class PullRequest(BaseModel):
             closed_week=closed_week,
             reviewers=reviewers,
         )
+
+        logger.debug("[END] Creating PullRequest from data")
+        return result

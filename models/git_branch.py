@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from pydantic import BaseModel
@@ -21,9 +22,15 @@ class GitBranch(BaseModel):
         :param discard_name_str: list of strings to discard from the name
         :return: GitBranch object
         """
+        logger = logging.getLogger(__name__)
+        logger.debug("[BEGIN] Creating GitBranch from data")
+
         creator = format_name(
             name=data["creator"]["displayName"], discard_str=discard_name_str
         )
-        return GitBranch(
+        result = GitBranch(
             repo=repo, name=data["name"].replace("refs/heads/", ""), creator=creator
         )
+
+        logger.debug("[END] Creating GitBranch from data")
+        return result
