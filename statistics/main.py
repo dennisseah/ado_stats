@@ -3,7 +3,7 @@ from statistics.feature import generate as generate_feature
 from statistics.git_branches import generate as generate_git_branches
 from statistics.milestone import generate as generate_milestone
 from statistics.pull_request import generate as generate_pull_request
-from statistics.sidebar import render as render_sidebar
+from statistics.sidebar import Sidebar
 from statistics.task import generate as generate_task
 from statistics.user_story import generate as generate_user_story
 
@@ -32,15 +32,22 @@ def main(with_st: bool = False):
     ]
 
     if with_st:
-        st.markdown(settings.azdo_org_name)
-        if settings.crew:
-            st.markdown(settings.crew)
-        render_sidebar()
+        col1, col2 = st.columns([8, 1])
+
+        with col1:
+            st.markdown(settings.azdo_org_name)
+            if settings.crew:
+                st.markdown(settings.crew)
+
+        with col2:
+            st.button("MVE", type="secondary", disabled=True)
     else:
         print(settings.azdo_org_name)
         if settings.crew:
             print(settings.crew)
         print()
+
+    Sidebar(streamlit=with_st).render()
 
     tabs = st.tabs(titles) if with_st else []
 

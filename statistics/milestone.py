@@ -26,7 +26,8 @@ def aggr_milestones() -> list[tuple[str, str, str, str, int, int]]:
     :return: The aggregated story points.
     """
     milestones = get_milestones()
-    user_stories = [x for x in fetch_stories() if x.milestone]
+    stories = fetch_stories()
+    backlogs = set()
 
     def fmt_date(d: datetime | None) -> str:
         return d.strftime("%Y-%m-%d") if d else ""
@@ -36,7 +37,10 @@ def aggr_milestones() -> list[tuple[str, str, str, str, int, int]]:
         "closed": defaultdict(int),
     }
 
-    for story in user_stories:
+    for story in stories:
+        if story.milestone not in milestones:
+            backlogs.add(story.milestone)
+
         if story.state == "Closed" or story.state == "Resolved":
             points["closed"][story.milestone] += (
                 story.story_points if story.story_points > 0 else 5
@@ -46,18 +50,24 @@ def aggr_milestones() -> list[tuple[str, str, str, str, int, int]]:
                 story.story_points if story.story_points > 0 else 5
             )
 
-    def fmt_point(id: str, milestone: Milestone) -> tuple[str, str, str, str, int, int]:
+    def fmt_point(
+        id: str, milestone: Milestone | None
+    ) -> tuple[str, str, str, str, int, int]:
         return (
-            milestone.name,
-            milestone.timeframe,
-            fmt_date(milestone.start_date),
-            fmt_date(milestone.finish_date),
+            milestone.name if milestone else "backlog",
+            milestone.timeframe if milestone else "future",
+            fmt_date(milestone.start_date) if milestone else "---",
+            fmt_date(milestone.finish_date) if milestone else "---",
             points["open"].get(id, 0),
             points["closed"].get(id, 0),
         )
 
     results = [fmt_point(id, milestone) for id, milestone in milestones.items()]
+
     results.sort(key=lambda x: (x[2], x[0]))
+    for backlog in backlogs:
+        results.append(fmt_point(backlog, None))
+
     return results
 
 

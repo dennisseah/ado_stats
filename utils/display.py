@@ -41,7 +41,8 @@ def as_table_group(
     def streamlit_tbl(tbl: Table):
         st.markdown(f"**{tbl.title}**")
         if tbl.streamlit_chart:
-            tbl.streamlit_chart(tbl.to_dataframe())  # type: ignore
+            with st.container(border=True):
+                tbl.streamlit_chart(tbl.to_dataframe())  # type: ignore
 
         if tbl.tbl_note:
             st.markdown(tbl.tbl_note)
