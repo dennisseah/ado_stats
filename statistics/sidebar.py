@@ -1,20 +1,25 @@
-from typing import Callable
+from typing import Any
 
 import streamlit as st
 
 from services.bugs import fetch as fetch_bugs
 from services.features import fetch as fetch_features
+from services.git_repositories import fetch as fetch_repositories
 from services.milestones import fetch as fetch_milestones
+from services.pull_requests import fetch as fetch_pull_requests
 from services.tasks import fetch as fetch_tasks
 from services.user_stories import fetch as fetch_stories
 
 
-def completion_rate(title: str, fn: Callable):
-    total = fn()
-
+def completion_rate(title: str, total: list[Any], attr_name: str = "state"):
     if total:
         completed = len(
-            [f for f in total if f.state in ["Closed", "Resolved", "Removed"]]
+            [
+                f
+                for f in total
+                if getattr(f, attr_name)
+                in ["Closed", "Resolved", "Removed", "completed", "abandoned"]
+            ]
         )
         ratio = completed / len(total) if len(total) > 0 else 0
 
@@ -69,7 +74,13 @@ def render():
         milesstone_completion_rate()
         st.divider()
 
-        completion_rate("Features", fetch_features)
-        completion_rate("User Stories", fetch_stories)
-        completion_rate("Tasks", fetch_tasks)
-        completion_rate("Bugs", fetch_bugs)
+        completion_rate("Features", fetch_features())
+        completion_rate("User Stories", fetch_stories())
+        completion_rate("Tasks", fetch_tasks())
+        completion_rate("Bugs", fetch_bugs())
+
+        pull_requests = []
+        for repo in fetch_repositories():
+            pull_requests += fetch_pull_requests(repo)
+
+        completion_rate(title="Pull Requests", total=pull_requests, attr_name="status")
