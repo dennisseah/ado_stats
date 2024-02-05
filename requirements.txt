@@ -855,9 +855,9 @@ six==1.16.0 ; python_version >= "3.10" and python_version < "4.0" \
 smmap==5.0.1 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:dceeb6c0028fdb6734471eb07c0cd2aae706ccaecab45965ee83f11c8d3b1f62 \
     --hash=sha256:e6d8668fa5f93e706934a62d7b4db19c8d9eb8cf2adbb75ef1b675aa332b69da
-streamlit==1.29.0 ; python_version >= "3.10" and python_version < "4.0" \
-    --hash=sha256:753510edb5bb831af0e3bdacd353c879ad5b4f0211e7efa0ec378809464868b4 \
-    --hash=sha256:b6dfff9c5e132e5518c92150efcd452980db492a45fafeac3d4688d2334efa07
+streamlit==1.31.0 ; python_version >= "3.10" and python_version < "4.0" \
+    --hash=sha256:40d71944e30394612481f80a8bc09e7de40d33b7a472989807467a5299e342ca \
+    --hash=sha256:4d95c4f5d6881f7adebaec14997fa7024bb38853412d1bba9588074d585563f9
 tabulate==0.9.0 ; python_version >= "3.10" and python_version < "4.0" \
     --hash=sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c \
     --hash=sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f
