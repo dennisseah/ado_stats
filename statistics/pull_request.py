@@ -2,6 +2,7 @@ from collections import defaultdict
 
 from pydantic import BaseModel
 
+from configurations.azdo_settings import Azdo_Settings
 from models.git_commit import GitCommit
 from models.pull_request import PullRequest
 from services.git_commits import fetch as fetch_commits
@@ -23,28 +24,55 @@ class GitCommitCountItem(BaseModel):
     added: int = 0
     deleted: int = 0
     edited: int = 0
+    start_date: str | None = None
+    end_date: str | None = None
 
 
-def aggr_commits(results: list[GitCommit]) -> list[tuple[str, int, int, int, int]]:
+def aggr_commits(
+    results: list[GitCommit],
+) -> list[tuple[str, str | None, str | None, int, int, int, int]]:
     """Aggregate commits by engineer.
 
     :param results: The list of commits.
     :return: The aggregated commits.
     """
+    settings = Azdo_Settings.model_validate({})
+
     engineers = set([result.committer for result in results])
     counts: dict[str, GitCommitCountItem] = {
         engr: GitCommitCountItem() for engr in engineers
     }
+    if settings:
+        counts = {
+            k: v
+            for k, v in counts.items()
+            if k not in settings.get_pull_requests_name_aliases()
+        }
 
     for engr in engineers:
         for commit in filter(lambda x: x.committer == engr, results):
+            engr = settings.get_pull_requests_name_aliases().get(engr, engr)
+
             counts[engr].total += commit.added + commit.deleted + commit.edited
             counts[engr].added += commit.added
             counts[engr].deleted += commit.deleted
             counts[engr].edited += commit.edited
+            counts[engr].start_date = (
+                min(counts[engr].start_date, commit.commit_date)  # type: ignore
+                if counts[engr].start_date
+                else commit.commit_date
+            )
+            counts[engr].end_date = (
+                max(counts[engr].end_date, commit.commit_date)  # type: ignore
+                if counts[engr].end_date
+                else commit.commit_date
+            )
 
-    response = [(k, v.total, v.added, v.deleted, v.edited) for k, v in counts.items()]
-    response.sort(key=lambda x: x[1], reverse=True)
+    response = [
+        (k, v.start_date, v.end_date, v.total, v.added, v.deleted, v.edited)
+        for k, v in counts.items()
+    ]
+    response.sort(key=lambda x: x[3], reverse=True)
     return response
 
 
@@ -161,7 +189,9 @@ def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]) -> Table:
     )
 
 
-def tbl_commits(title: str, data: list[tuple[str, int, int, int, int]]) -> Table:
+def tbl_commits(
+    title: str, data: list[tuple[str, str | None, str | None, int, int, int, int]]
+) -> Table:
     """Returns git commits table.
 
     :param title: The title of the table.
@@ -170,7 +200,16 @@ def tbl_commits(title: str, data: list[tuple[str, int, int, int, int]]) -> Table
     """
     return Table(
         title=title,
-        headers=["engineer", "total", "files added", "files deleted", "files edited"],
+        headers=[
+            "engineer",
+            "started",
+            "last",
+            "# total",
+            "# added",
+            "# deleted",
+            "# edited",
+        ],
+        tbl_note=r"\# is the number of files added, deleted, or edited.",
         data=data,
     )
 

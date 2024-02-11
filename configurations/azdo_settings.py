@@ -13,6 +13,7 @@ class Azdo_Settings(BaseSettings):
     repos_ignore: str | None = None
     name_discard_str: str | None = None
     crew: str | None = None
+    pull_requests_name_aliases: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -55,3 +56,19 @@ class Azdo_Settings(BaseSettings):
 
     def get_rest_base_uri(self) -> str:
         return f"https://dev.azure.com/{self.azdo_project_name}/{parser.quote(self.azdo_org_name)}/_apis"
+
+    def get_pull_requests_name_aliases(self) -> dict[str, str]:
+        if not self.pull_requests_name_aliases:
+            return {}
+
+        aliases = {}
+        for alias in self.pull_requests_name_aliases.split(";"):
+            if alias:
+                parts = alias.strip().split(":")
+                if len(parts) != 2:
+                    raise ValueError(
+                        f"Invalid alias format: {alias}. Must be in the format 'name:alias'"  # noqa E501
+                    )
+                aliases[parts[0]] = parts[1]
+
+        return aliases

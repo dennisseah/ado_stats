@@ -26,3 +26,16 @@ def to_week(d: datetime | None) -> str | None:
     week = str(d.isocalendar().week)
     week = "0" + week if len(week) == 1 else week
     return f"{d.year} - {week}"
+
+
+def to_date_str(d: datetime | None) -> str:
+    """Converts the given datetime to string Year-Month-day.
+
+    :param d: The datetime.
+    :return: formatted date string.
+    """
+    if not d:
+        return ""
+    month = f"0{d.month}" if d.month < 10 else f"{d.month}"
+    day = f"0{d.day}" if d.day < 10 else f"{d.day}"
+    return f"{d.year}-{month}-{day}"
