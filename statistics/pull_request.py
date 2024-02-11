@@ -2,7 +2,9 @@ from collections import defaultdict
 
 from pydantic import BaseModel
 
+from models.git_commit import GitCommit
 from models.pull_request import PullRequest
+from services.git_commits import fetch as fetch_commits
 from services.git_repositories import fetch as fetch_repositories
 from services.pull_requests import fetch as fetch_pull_requests
 from utils.display import Table, as_table_group, plot_bar_chart
@@ -14,6 +16,36 @@ class CountItem(BaseModel):
     completed: int = 0
     abandoned: int = 0
     reviewed: int = 0
+
+
+class GitCommitCountItem(BaseModel):
+    total: int = 0
+    added: int = 0
+    deleted: int = 0
+    edited: int = 0
+
+
+def aggr_commits(results: list[GitCommit]) -> list[tuple[str, int, int, int, int]]:
+    """Aggregate commits by engineer.
+
+    :param results: The list of commits.
+    :return: The aggregated commits.
+    """
+    engineers = set([result.committer for result in results])
+    counts: dict[str, GitCommitCountItem] = {
+        engr: GitCommitCountItem() for engr in engineers
+    }
+
+    for engr in engineers:
+        for commit in filter(lambda x: x.committer == engr, results):
+            counts[engr].total += commit.added + commit.deleted + commit.edited
+            counts[engr].added += commit.added
+            counts[engr].deleted += commit.deleted
+            counts[engr].edited += commit.edited
+
+    response = [(k, v.total, v.added, v.deleted, v.edited) for k, v in counts.items()]
+    response.sort(key=lambda x: x[1], reverse=True)
+    return response
 
 
 def aggr(results: list[PullRequest]) -> list[tuple[str, int, int, int, int, int]]:
@@ -129,6 +161,20 @@ def tbl(title: str, data: list[tuple[str, int, int, int, int, int]]) -> Table:
     )
 
 
+def tbl_commits(title: str, data: list[tuple[str, int, int, int, int]]) -> Table:
+    """Returns git commits table.
+
+    :param title: The title of the table.
+    :param data: The data to be aggregated.
+    :return: Display table object.
+    """
+    return Table(
+        title=title,
+        headers=["engineer", "total", "files added", "files deleted", "files edited"],
+        data=data,
+    )
+
+
 def generate(title: str, streamlit: bool = False):
     """Generate statistics for pull requests.
 
@@ -136,20 +182,26 @@ def generate(title: str, streamlit: bool = False):
     :param streamlit: Whether to display the statistics in Streamlit.
     """
     repos = fetch_repositories()
-    total = []
+    total_prs = []
+    total_commits = []
     merge_times = []
 
     tables = []
 
     for repo in repos:
         prs = fetch_pull_requests(repo)
+        commits = fetch_commits(repo)
+
         tables.append(tbl(title=repo, data=aggr(prs)))
-        tables.append(by_week(title=repo, results=prs))
+        tables.append(by_week(title=f"{repo} (by week)", results=prs))
+        tables.append(tbl_commits(title=f"{repo} commits", data=aggr_commits(commits)))
         merge_times.append(time_to_merge(repo, prs))
-        total += prs
+
+        total_commits += commits
+        total_prs += prs
 
     if len(repos) > 1:
-        tables.append(tbl(title="total", data=aggr(total)))
+        tables.append(tbl(title="total", data=aggr(total_prs)))
 
     tables.append(
         Table(
