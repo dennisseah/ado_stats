@@ -25,7 +25,14 @@ class Sidebar:
                     f
                     for f in total
                     if getattr(f, attr_name)
-                    in ["Closed", "Resolved", "Removed", "completed", "abandoned"]
+                    in [
+                        "Closed",
+                        "Resolved",
+                        "Removed",
+                        "completed",
+                        "abandoned",
+                        "Done",
+                    ]
                 ]
             )
             ratio = completed / len(total) if len(total) > 0 else 0
