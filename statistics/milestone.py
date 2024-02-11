@@ -76,7 +76,7 @@ def plot_chart(df: pd.DataFrame):
 
     :param df: The data frame.
     """
-    st.markdown("Burndown chart")
+    st.markdown("Story points per sprint")
     st.area_chart(df, x="milestone", y=["active", "resolved"])
 
 
@@ -86,7 +86,30 @@ def generate(title: str, streamlit: bool = False):
     :param title: The title of the statistics.
     :param streamlit: Whether to display the statistics in Streamlit.
     """
-
+    if streamlit:
+        with st.expander("guidelines"):
+            st.markdown("**Story points per sprint**")
+            st.markdown(
+                "This are chart shows the story points by milestone. "
+                "It shows the active and resolved stories by points."
+            )
+            st.markdown(
+                "The table below shows the same information in tabular form. "
+                "The table shows the number of story points for each sprints. "
+                "For completed sprints, it shows the number of story points resolved. "
+                "For current and future sprints, it shows the number of story points"
+                "planned. "
+                "It is important to note that the story points are not always accurate "
+                "because they are just estimates. During sprint planning, it is "
+                "important \n"
+                "1. Review the story points and adjust them as necessary.\n"
+                "2. Do not over commit during sprint planning, and number of story "
+                "points per sprint can provide a good indication of the team's "
+                "velocity.\n"
+                "3. Do not under commit during sprint planning.\n"
+                "4. Development team members should be aware that committed story "
+                "for the sprint should be completed by the end of the sprint.\n"
+            )
     points = aggr_milestones()
     tbl = Table(
         title="Story points by milestone",
