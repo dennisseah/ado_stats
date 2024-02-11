@@ -20,9 +20,7 @@ def validate():
     for chunk in divide_chunks(child_ids, 200):
         user_stories += fetch_work_items(item_ids=chunk, creator=UserStory.from_data)
 
-    closed_user_stories = set(
-        [us.id for us in user_stories if us.state == "Closed" or us.state == "Resolved"]
-    )
+    closed_user_stories = set([us.id for us in user_stories if us.is_completed()])
 
     data = []
     for feature in features:

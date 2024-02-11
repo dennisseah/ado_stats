@@ -87,7 +87,7 @@ def generate(title: str, streamlit: bool = False):
     :param streamlit: Whether to display the statistics in Streamlit.
     """
     if streamlit:
-        with st.expander("guidelines"):
+        with st.expander("information"):
             st.markdown("**Story points per sprint**")
             st.markdown(
                 "This are chart shows the story points by milestone. "

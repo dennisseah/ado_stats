@@ -26,3 +26,10 @@ class UserStory(WorkItem):
 
         logger.debug("[END] Creating UserStory from data")
         return result
+
+    def is_completed(self) -> bool:
+        """Check if the user story is completed.
+
+        :return: True if completed, False otherwise
+        """
+        return self.state in ["Closed", "Resolved", "Done", "Removed"]

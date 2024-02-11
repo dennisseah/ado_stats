@@ -1,4 +1,5 @@
 from statistics.bug import generate as generate_bug
+from statistics.burndown import generate as generate_burndown
 from statistics.feature import generate as generate_feature
 from statistics.git_branches import generate as generate_git_branches
 from statistics.milestone import generate as generate_milestone
@@ -21,6 +22,7 @@ def main(with_st: bool = False):
     settings = Azdo_Settings.model_validate({})
 
     titles = [
+        "Burndown Chart",
         "Milestones",
         "Features",
         "User Stories",
@@ -53,6 +55,7 @@ def main(with_st: bool = False):
 
     for i, genr in enumerate(
         [
+            generate_burndown,
             generate_milestone,
             generate_feature,
             generate_user_story,
