@@ -24,8 +24,8 @@ def aggr_state(title: str, data: list[Any]) -> Table:
         plt.pie(
             data["count"],
             labels=data["state"],
-            autopct="%1.1f%%",
-            textprops={"fontsize": 5},
+            autopct="%1.0f%%",
+            textprops={"fontsize": 4.5},
         )
         st.pyplot(fig.figure, use_container_width=False)
 

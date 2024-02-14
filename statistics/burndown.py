@@ -6,6 +6,10 @@ from utils.display import Table, as_table_group
 
 
 def fetch_data() -> list[tuple[str, int, int]]:
+    """Fetch data for burndown chart.
+
+    :return: The data for the burndown chart.
+    """
     user_stories = fetch_stories()
 
     week_ranges = set([us.created_week for us in user_stories])
@@ -51,28 +55,31 @@ def generate(title: str, streamlit: bool = False):
     :param title: The title of the statistics.
     :param streamlit: Whether to display the statistics in Streamlit.
     """
-    if streamlit:
-        with st.expander("information"):
-            st.markdown("**Burndown rate**")
-            st.markdown(
-                "This chart shows the amount of work that has been completed in a "
-                "sprint, and the total work remaining. Burndown charts are used "
-                "to predict your team's likelihood of completing their work in the "
-                " time available. Here are the guidelines\n"
-                "1. Perform capacity planning\n"
-                "2. Track progress\n"
-                "3. Identify scope creep\n"
-                "4. Identify bottlenecks\n"
-                "5. Understand the team's velocity in completing tasks\n"
-                "6. Inform ensemble's stakeholders of the team's progress, and "
-                "request for more development team when needed.\n"
-            )
-    points = fetch_data()
-    tbl = Table(
-        title="Burndown Chart",
-        headers=["week", "completed", "backlog"],
-        data=points,
-        streamlit_chart=plot_chart,
-    )
+    try:
+        if streamlit:
+            with st.expander("information"):
+                st.markdown("**Burndown rate**")
+                st.markdown(
+                    "This chart shows the amount of work that has been completed in a "
+                    "sprint, and the total work remaining. Burndown charts are used "
+                    "to predict your team's likelihood of completing their work in the "
+                    " time available. Here are the guidelines\n"
+                    "1. Perform capacity planning\n"
+                    "2. Track progress\n"
+                    "3. Identify scope creep\n"
+                    "4. Identify bottlenecks\n"
+                    "5. Understand the team's velocity in completing tasks\n"
+                    "6. Inform ensemble's stakeholders of the team's progress, and "
+                    "request for more development team when needed.\n"
+                )
+        points = fetch_data()
+        tbl = Table(
+            title="Burndown Chart",
+            headers=["week", "completed", "backlog"],
+            data=points,
+            streamlit_chart=plot_chart,
+        )
 
-    as_table_group(group_name=title, tables=[tbl], streamlit=streamlit)
+        as_table_group(group_name=title, tables=[tbl], streamlit=streamlit)
+    except Exception:
+        st.markdown("Error")
